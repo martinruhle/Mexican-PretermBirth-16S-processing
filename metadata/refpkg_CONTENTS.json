@@ -1,0 +1,61 @@
+{
+    "metadata": {
+        "create_date": "2026-02-18 01:11:21",
+        "format_version": "1.1",
+        "locus": "16S"
+    },
+    "files": {
+        "phylo_model": "phylo_modelalxa03pr.json",
+        "aln_fasta": "recruits.aln.fasta",
+        "aln_sto": "recruits.aln.sto",
+        "profile": "SSU_rRNA_bacteria.cm",
+        "seq_info": "references_seq_info.csv",
+        "taxonomy": "refpkg.taxtable.csv",
+        "tree": "treeckq22_gn.tre",
+        "tree_stats": "RAxML_info.refpkg"
+    },
+    "md5": {
+        "phylo_model": "c00a70eac704963143212c00d20f4a0e",
+        "aln_fasta": "56c2bd9d4ff163e41d1775388c94658f",
+        "aln_sto": "c5325bc74158eb80658b201d6aae924a",
+        "profile": "ac7a6de88bfe604bcaeb9b9f92107412",
+        "seq_info": "535a746bd38e2f741a218a3949975488",
+        "taxonomy": "31ca082a10952666af62400d0f730255",
+        "tree": "11f0e00840b56944389f3605e33b0c0e",
+        "tree_stats": "71fb8dff323c091579aaa825f06ced05"
+    },
+    "log": [
+        "Rerooted",
+        "Stripped refpkg (removed 0 files)",
+        "Loaded initial files into empty refpkg"
+    ],
+    "rollback": {
+        "metadata": {
+            "create_date": "2026-02-18 01:11:21",
+            "format_version": "1.1",
+            "locus": "16S"
+        },
+        "files": {
+            "phylo_model": "phylo_modelalxa03pr.json",
+            "aln_fasta": "recruits.aln.fasta",
+            "aln_sto": "recruits.aln.sto",
+            "profile": "SSU_rRNA_bacteria.cm",
+            "seq_info": "references_seq_info.csv",
+            "taxonomy": "refpkg.taxtable.csv",
+            "tree": "RAxML_bestTree.refpkg",
+            "tree_stats": "RAxML_info.refpkg"
+        },
+        "md5": {
+            "phylo_model": "c00a70eac704963143212c00d20f4a0e",
+            "aln_fasta": "56c2bd9d4ff163e41d1775388c94658f",
+            "aln_sto": "c5325bc74158eb80658b201d6aae924a",
+            "profile": "ac7a6de88bfe604bcaeb9b9f92107412",
+            "seq_info": "535a746bd38e2f741a218a3949975488",
+            "taxonomy": "31ca082a10952666af62400d0f730255",
+            "tree": "c5ddcc46087435fd4873daf2f3b7fbfa",
+            "tree_stats": "71fb8dff323c091579aaa825f06ced05"
+        },
+        "rollback": null
+    },
+    "rollforward": null
+}

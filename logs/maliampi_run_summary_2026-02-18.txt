@@ -1,0 +1,64 @@
+# Final MaLiAmPi run: full process table and completion trailer.
+# Source: tail of nohup.out. The run was resumed (-resume) repeatedly, so
+# most processes report as cached; 'CPU hours' is the accumulated total.
+
+executor >  local (10)
+[-        ] preprocess_wf:barcodecop                        -
+[13/2f256f] preprocess_wf:FastQC_Raw (222)                  | 222 of 222, cached: 222 ✔
+[fa/4fbb05] preprocess_wf:TrimGalore (104)                  | 111 of 111, cached: 111 ✔
+[-        ] preprocess_wf:TrimGaloreSE                      -
+[1f/f4347b] dada2_wf:dada2_ft (111)                         | 111 of 111, cached: 111 ✔
+[-        ] dada2_wf:dada2_ft_se                            -
+[-        ] dada2_wf:dada2_ft_pyro                          -
+[8b/992185] dada2_wf:FastQC_PostFT (221)                    | 222 of 222, cached: 222 ✔
+[6e/2fcaed] dada2_wf:dada2_derep (111)                      | 111 of 111, cached: 111 ✔
+[-        ] dada2_wf:dada2_derep_se                         -
+[-        ] dada2_wf:dada2_derep_pyro                       -
+[74/1dd473] dada2_wf:dada2_learn_error (22)                 | 24 of 24, cached: 24 ✔
+[-        ] dada2_wf:dada2_learn_error_pyro                 -
+[4e/b291d6] dada2_wf:dada2_derep_batches (24)               | 24 of 24, cached: 24 ✔
+[-        ] dada2_wf:dada2_derep_batches_pyro               -
+[e3/4fb77e] dada2_wf:dada2_dada (22)                        | 24 of 24, cached: 24 ✔
+[-        ] dada2_wf:dada2_dada_pyro                        -
+[b9/54c6a5] dada2_wf:dada2_demultiplex_dada (23)            | 24 of 24, cached: 24 ✔
+[d9/802992] dada2_wf:dada2_merge (111)                      | 111 of 111, cached: 111 ✔
+[29/2f489d] dada2_wf:dada2_seqtab_sp (111)                  | 111 of 111, cached: 111 ✔
+[b3/170184] dada2_wf:dada2_seqtab_combine_batch (10)        | 12 of 12, cached: 12 ✔
+[26/f22a16] dada2_wf:dada2_seqtab_combine_all               | 1 of 1, cached: 1 ✔
+[e4/93ee10] dada2_wf:dada2_remove_bimera                    | 1 of 1, cached: 1 ✔
+[72/a58f87] dada2_wf:Dada2_convert_output                   | 1 of 1, cached: 1 ✔
+[90/fb677a] output_failed                                   | 1 of 1, cached: 1 ✔
+[d9/f20f73] make_refpkg_wf:RefpkgSearchRepo                 | 1 of 1, cached: 1 ✔
+[f2/8ee2cd] make_refpkg_wf:FilterSeqInfo                    | 1 of 1, cached: 1 ✔
+[d1/3d64d8] make_refpkg_wf:BuildTaxtasticDB                 | 1 of 1, cached: 1 ✔
+[0a/6395f7] make_refpkg_wf:ConfirmSI                        | 1 of 1, cached: 1 ✔
+[6c/4e9728] make_refpkg_wf:RemoveDroppedRecruits            | 1 of 1, cached: 1 ✔
+[5c/5c2a7a] make_refpkg_wf:CombinedRefFilter                | 1 of 1, cached: 1 ✔
+[ff/90f6ce] make_refpkg_wf:AlignRepoRecruits                | 1 of 1, cached: 1 ✔
+[3f/fd25dc] make_refpkg_wf:ConvertAlnToFasta                | 1 of 1, cached: 1 ✔
+[d2/631ed7] make_refpkg_wf:TaxtableForSI                    | 1 of 1, cached: 1 ✔
+[48/d5ff5d] make_refpkg_wf:RaxmlTree                        | 1 of 1, cached: 1 ✔
+[2d/4be511] make_refpkg_wf:RaxmlTree_cleanupInfo            | 1 of 1, cached: 1 ✔
+[83/7aee3b] make_refpkg_wf:CombineRefpkg_og                 | 1 of 1, cached: 1 ✔
+[52/1c47b1] pplacer_place_classify_wf:ExtractRefpkg         | 1 of 1, cached: 1 ✔
+[84/665d65] pplacer_place_classify_wf:AlignSV               | 1 of 1, cached: 1 ✔
+[94/c7ea6f] pplacer_place_classify_wf:CombineAln_SV_refpkg  | 1 of 1, cached: 1 ✔
+[3a/06ed49] pplacer_place_classify_wf:PplacerPlacement      | 1 of 1, cached: 1 ✔
+[95/ef979b] pplacer_place_classify_wf:PplacerReduplicate    | 1 of 1, cached: 1 ✔
+[dc/4743ab] pplacer_place_classify_wf:PplacerADCL           | 1 of 1, cached: 1 ✔
+[e9/bc770e] pplacer_place_classify_wf:PplacerEDPL           | 1 of 1, cached: 1 ✔
+[f5/34b0e6] pplacer_place_classify_wf:PplacerPCA            | 1 of 1, cached: 1 ✔
+[4e/8959f8] pplacer_place_classify_wf:PplacerAlphaDiversity | 1 of 1, cached: 1 ✔
+[f3/db1b73] pplacer_place_classify_wf:PplacerKR             | 1 of 1, cached: 1 ✔
+[ae/dbbc59] pplacer_place_classify_wf:ClassifyDB_Prep       | 1 of 1 ✔
+[cf/dc9601] pplacer_place_classify_wf:ClassifySV            | 1 of 1 ✔
+[17/e72fb8] pplacer_place_classify_wf:ClassifyMCC           | 1 of 1 ✔
+[85/bcf8c8] pplacer_place_classify_wf:ClassifyTables (6)    | 6 of 6 ✔
+[f9/316119] pplacer_place_classify_wf:Extract_Taxonomy      | 1 of 1 ✔
+Completed at: 18-Feb-2026 12:00:03
+Duration    : 5m 48s
+CPU hours   : 970.1 (100% cached)
+Succeeded   : 10
+Cached      : 1'133
+
+

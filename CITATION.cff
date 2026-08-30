@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this provenance record, please cite it together with the analysis compendium it feeds."
+title: "Mexican-PretermBirth-16S-processing: provenance record for the 16S upstream processing of the Mexican preterm birth cohort"
+type: software
+license: MIT
+repository-code: "https://github.com/martinruhle/Mexican-PretermBirth-16S-processing"
+authors:
+  - family-names: "Ruhle"
+    given-names: "Martin"
+    email: "martinruhle@gmail.com"
+references:
+  - type: software
+    title: "Mexican-PretermBirth-analysis"
+    repository-code: "https://github.com/martinruhle/Mexican-PretermBirth-analysis"
+    authors:
+      - family-names: "Ruhle"
+        given-names: "Martin"
+  - type: software
+    title: "MaLiAmPi: Maximum Likelihood Amplicon Pipeline"
+    repository-code: "https://github.com/jgolob/maliampi"
+    authors:
+      - family-names: "Golob"
+        given-names: "Jonathan"

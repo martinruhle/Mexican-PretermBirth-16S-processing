@@ -1,0 +1,17 @@
+# Every process of the refpkg-BUILDING sub-workflow (make_refpkg_wf) as it
+# appears in the final run trace. These processes only execute when the
+# reference package is built from a sequence repository.
+# Source: nohup.out of the final run (completed 18-Feb-2026 12:00:03).
+
+[0a/6395f7] make_refpkg_wf:ConfirmSI                        | 1 of 1, cached: 1 ✔
+[2d/4be511] make_refpkg_wf:RaxmlTree_cleanupInfo            | 1 of 1, cached: 1 ✔
+[3f/fd25dc] make_refpkg_wf:ConvertAlnToFasta                | 1 of 1, cached: 1 ✔
+[48/d5ff5d] make_refpkg_wf:RaxmlTree                        | 1 of 1, cached: 1 ✔
+[5c/5c2a7a] make_refpkg_wf:CombinedRefFilter                | 1 of 1, cached: 1 ✔
+[6c/4e9728] make_refpkg_wf:RemoveDroppedRecruits            | 1 of 1, cached: 1 ✔
+[83/7aee3b] make_refpkg_wf:CombineRefpkg_og                 | 1 of 1, cached: 1 ✔
+[d1/3d64d8] make_refpkg_wf:BuildTaxtasticDB                 | 1 of 1, cached: 1 ✔
+[d2/631ed7] make_refpkg_wf:TaxtableForSI                    | 1 of 1, cached: 1 ✔
+[d9/f20f73] make_refpkg_wf:RefpkgSearchRepo                 | 1 of 1, cached: 1 ✔
+[f2/8ee2cd] make_refpkg_wf:FilterSeqInfo                    | 1 of 1, cached: 1 ✔
+[ff/90f6ce] make_refpkg_wf:AlignRepoRecruits                | 1 of 1, cached: 1 ✔

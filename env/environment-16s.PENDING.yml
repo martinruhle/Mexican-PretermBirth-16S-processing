@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------------
+# INCOMPLETE — DO NOT CREATE AN ENVIRONMENT FROM THIS FILE YET.
+#
+# Every version below is a placeholder, written as x.y.z so that conda fails
+# loudly rather than silently resolving to whatever is newest today. The file is
+# named .PENDING.yml for the same reason.
+#
+# This is the skeleton for the downstream 16S tooling: the steps that run AFTER
+# MaLiAmPi and are not covered by the workflow's own containers. The MaLiAmPi
+# tool chain itself is pinned by the workflow revision (3239c625a8) and does not
+# belong here — see VERSIONS.md.
+#
+# To complete it, on the machine that actually runs these tools:
+#   conda list --explicit           # exact builds, or
+#   conda env export --no-builds    # then keep only what is genuinely used
+# and replace every x.y.z with the observed value. Do not copy versions out of
+# documentation, and do not leave open ranges.
+# ---------------------------------------------------------------------------
+name: ptb-16s
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # --- workflow driver -----------------------------------------------------
+  - nextflow=25.04.8          # VERIFIED: logs/nextflow_runtime_header.txt
+  - openjdk=17.0.16           # VERIFIED: same
+  # --- placement / phylotypes ----------------------------------------------
+  - pplacer=x.y.z             # PENDING: read from the container the workflow uses
+  - taxtastic=0.9.5D          # VERIFIED: container tag golob/taxtastic:0.9.5D
+  # --- community state types ------------------------------------------------
+  - python=x.y.z              # PENDING
+  - pandas=x.y.z              # PENDING - required by VALENCIA
+  - numpy=x.y.z               # PENDING - required by VALENCIA
+  # VALENCIA is not on conda; it is a script obtained from its own repository.
+  # Record its commit hash here once fixed:
+  #   VALENCIA commit: PENDING
+  # --- R side (concordance report) -----------------------------------------
+  - r-base=x.y.z              # PENDING
+  - r-tidyverse=x.y.z         # PENDING
+  - r-vegan=x.y.z             # PENDING
+  - r-patchwork=x.y.z         # PENDING
+  - r-ggrepel=x.y.z           # PENDING
+  - r-scales=x.y.z            # PENDING

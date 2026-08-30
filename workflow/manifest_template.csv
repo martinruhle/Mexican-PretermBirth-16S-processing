@@ -1,0 +1,4 @@
+specimen,R1,R2,batch
+SPECIMEN_ID_1,/absolute/path/to/SPECIMEN_ID_1_R1.fastq.gz,/absolute/path/to/SPECIMEN_ID_1_R2.fastq.gz,batch_1
+SPECIMEN_ID_2,/absolute/path/to/SPECIMEN_ID_2_R1.fastq.gz,/absolute/path/to/SPECIMEN_ID_2_R2.fastq.gz,batch_1
+SPECIMEN_ID_3,/absolute/path/to/SPECIMEN_ID_3_R1.fastq.gz,/absolute/path/to/SPECIMEN_ID_3_R2.fastq.gz,batch_2

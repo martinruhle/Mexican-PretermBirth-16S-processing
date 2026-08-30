@@ -1,0 +1,21 @@
+# Nextflow runtime header, verbatim from the debug log.
+# Nextflow does not stamp the year on its log timestamps; this log was
+# captured on 2026-02-13, so 'Nov-06' corresponds to 2025-11-06.
+# The workflow revision (3239c625a8) is the value that pins the pipeline code.
+
+Nov-06 14:49:04.428 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.8
+Nov-06 14:49:05.111 [main] DEBUG nextflow.cli.CmdRun - Launching `/home/martinruhle/.nextflow/assets/jgolob/maliampi_pplacer/main.nf` [jovial_mercator] DSL2 - revision: 3239c625a8
+Nov-06 14:49:05.171 [main] DEBUG nextflow.Session - Session UUID: 2ba48029-6232-4e3b-bb55-c9370aa2ef2f
+Nov-06 14:49:05.171 [main] DEBUG nextflow.Session - Run name: jovial_mercator
+Nov-06 14:49:05.202 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.04.8 build 5956
+  Created: 06-10-2025 21:19 UTC (18:19 ARST)
+  System: Linux 6.6.87.2-microsoft-standard-WSL2
+  Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 17.0.16+8-Ubuntu-0ubuntu122.04.1
+  Encoding: UTF-8 (UTF-8)
+  Process: 3952@MartinZenbook [127.0.1.1]
+  CPUs: 6 - Mem: 11.7 GB (9.9 GB) - Swap: 8 GB (8 GB)
+Nov-06 14:49:05.232 [main] DEBUG nextflow.Session - Work-dir: /home/martinruhle/datos_microbiota_vaginal/working_dir [ext2/ext3]
+
+# Final run of the same workflow, from nohup.out:
+Launching `/home/martinruhle/.nextflow/assets/jgolob/maliampi_pplacer/main.nf` [serene_gautier] DSL2 - revision: 3239c625a8

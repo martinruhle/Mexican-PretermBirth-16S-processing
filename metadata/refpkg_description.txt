@@ -1,0 +1,34 @@
+# Output of: Rscript scripts/describe_refpkg.R <refpkg.tar.gz>
+# Generated 2026-08-30 against the reference package of the 2026-02-18 run.
+
+== Archive ==
+file:                        refpkg.tar.gz
+bytes:                       6,117,378
+sha256:                      2a3ce022576744c0c0bd858f005db52ab2c27e6ec249a55c56ef3e9c87622b2e
+
+== CONTENTS.json ==
+create_date:                 2026-02-18 01:11:21
+format_version:              1.1
+locus:                       16S
+
+== Reference sequences ==
+aligned sequences:           5,540
+seq_info rows:               5,540
+length (bp):                 1200 - 1592 (median 1425)
+distinct species_name:       1,231
+distinct genus_name:         456
+download_date range:         2019-07-12 .. 2020-05-04
+
+== Taxonomy table ==
+nodes:                       2,553
+rank = species:              1,231
+rank = genus:                455
+rank = family:               186
+rank = order:                96
+rank = class:                47
+rank = phylum:               20
+
+== Tree inference ==
+RAxML:                       This is RAxML version 8.2.4 released by Alexandros Stamatakis on October 02 2015.
+alignment patterns:          Alignment has 2936 distinct alignment patterns
+gaps/undetermined:           Proportion of gaps and completely undetermined characters in this alignment: 65.12%

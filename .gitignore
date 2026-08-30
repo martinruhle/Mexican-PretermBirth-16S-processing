@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# GitHub is not the data archive.
+# Nothing that is regenerable, huge, or participant-level belongs in this repo.
+# See docs/DATA_ACCESS.md for where each of these actually lives.
+# ---------------------------------------------------------------------------
+
+# Sequencing reads and any per-participant abundance table
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+data/raw/
+data/maliampi/
+data/qiime2/
+
+# MaLiAmPi outputs (regenerable from the workflow; checksummed in metadata/)
+*.jplace
+*.jplace.gz
+*.mcc.db
+refpkg.tar.gz
+tallies_wide.*.csv
+by_specimen.*.csv
+by_taxon.*.csv
+sv_taxonomy.csv
+dada2.*
+
+# Nextflow scratch
+work/
+working_dir/
+.nextflow/
+.nextflow.log*
+nohup.out
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+renv/library/
+renv/staging/
+*_cache/
+*_files/
+Rplots.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db

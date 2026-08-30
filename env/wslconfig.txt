@@ -1,0 +1,9 @@
+# WSL2 configuration of the host machine during the run.
+# Copied verbatim from .wslconfig. This is what capped the pipeline at 6 CPUs
+# and ~12 GB of RAM, and therefore what made the run take months of wall clock.
+
+[wsl2]
+memory=12GB      # Límite de RAM para WSL
+processors=6     # Número de núcleos a usar (tu i5-1240P tiene 12 hilos, 6 es razonable)
+swap=8GB         # Tamaño del archivo swap
+localhostForwarding=true
