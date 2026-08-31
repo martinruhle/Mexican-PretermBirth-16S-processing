@@ -13,16 +13,20 @@ The reference package the run built is documented separately, in
 
 ## 1. In one paragraph
 
-111 vaginal 16S amplicon libraries (V3–V4, paired-end, 12 sequencing batches) from the
-Mexican preterm birth cohort were processed with **MaLiAmPi**
-(`jgolob/maliampi_pplacer`, workflow revision `3239c625a8`) under **Nextflow 25.04.8**
-on a laptop running Ubuntu under WSL2, with Docker containers and 6 CPUs / 11.5 GB of
-RAM. The pipeline denoised the reads with DADA2, built a 16S reference package from a
-local ARF sequence repository, placed every sequence variant on that reference
-phylogeny with pplacer, and classified the placements into taxonomic tables. The run
-was carried out in many resumed sessions and finished on **2026-02-18 12:00:03**, with
-**970.1 accumulated CPU hours**. No specimen failed. Phylotype binning — the step that
-would let these data be pooled with the DREAM Challenge cohorts — **was not run**.
+111 vaginal 16S amplicon libraries (V3–V4, paired-end, Illumina MiSeq) from the Mexican
+preterm birth cohort were processed with **MaLiAmPi**, in the `maliampi_pplacer` variant
+at workflow revision `3239c625a8`, under **Nextflow 25.04.8** on a laptop running Ubuntu
+under WSL2, with Docker containers and 6 CPUs / 11.5 GB of RAM. The pipeline denoised
+the reads with DADA2, built a 16S reference package from the ARF reference sequence
+repository, placed every sequence variant on that reference phylogeny with pplacer, and
+classified the placements into taxonomic tables. The run was carried out in many resumed
+sessions and finished on **2026-02-18 12:00:03**, with **970.1 accumulated CPU hours**.
+No specimen failed. Phylotype binning — the step that would let these data be pooled
+with the DREAM Challenge cohorts — **was not run**.
+
+Most of what makes this run worth documenting is not the happy path but the four memory
+and compatibility problems that had to be solved to fit it on a laptop:
+[`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
 
 ---
 
@@ -31,10 +35,27 @@ would let these data be pooled with the DREAM Challenge cohorts — **was not ru
 | | |
 |---|---|
 | Specimens in the manifest | 111 |
-| Sequencing batches | 12 (`lote_1` … `lote_12`) |
-| Reads | paired-end FASTQ, one R1/R2 pair per specimen |
+| Reads | paired-end FASTQ, one R1/R2 pair per specimen (222 files) |
 | Manifest columns | `specimen,R1,R2,batch` — see [`workflow/manifest_template.csv`](../workflow/manifest_template.csv) |
-| Reference repository | local ARF release under `~/arf_20200420/`: `dedup/1200bp/named/filtered/seqs.fasta`, the matching `seq_info.csv`, and `taxdmp.zip` |
+| `batch` values | 12 groups: `lote_1`–`lote_3` with 10 specimens each, `lote_4`–`lote_12` with 9 each |
+| Reference repository | ARF release `arf_20200420`, from Zenodo (<https://zenodo.org/records/6876634>), unpacked at `~/arf_20200420/`. Inputs used: `dedup/1200bp/named/filtered/seqs.fasta`, the matching `seq_info.csv`, and the `taxdmp.zip` shipped with it |
+
+> ### ⚠️ The `batch` column is not a sequencing batch
+>
+> Anyone reading a column called `batch` will assume library preparation batches and may
+> reach for it as a technical covariate. **It is not one.** All 111 specimens come from
+> one sequencing effort. The column is an engineering device: MaLiAmPi dereplicates all
+> specimens of a batch together, and dereplicating 111 at once exhausted the available
+> RAM, so they were split into 12 artificial groups of 9–10
+> ([`TROUBLESHOOTING.md` §1](TROUBLESHOOTING.md)).
+>
+> This has one real methodological cost, stated here rather than buried: **DADA2 learns
+> its error model per batch**, so the run carries twelve error models built from 9–10
+> specimens each, instead of one built from 111. That is a less robust error model, and
+> it is a consequence of the memory workaround, not a design choice.
+>
+> If any downstream analysis has treated `batch` as a batch effect to correct for, that
+> should be revisited.
 
 The FASTQ files are not in this repository and never will be; see
 [`DATA_ACCESS.md`](DATA_ACCESS.md). The raw reads for this cohort are deposited in the
@@ -51,7 +72,27 @@ NCBI Sequence Read Archive under BioProject **PRJNA1440471**.
 
 ## 3. What was run
 
-The exact command, verbatim from the Nextflow log, is in
+> ### ⚠️ The command below is from a session that failed, not from the final one
+>
+> The only Nextflow log kept in the project is the one from `Nov-06`, session
+> `jovial_mercator`, and that session **failed** at `make_refpkg_wf:TaxtableForSI`. The
+> command recorded in it is the one shown here.
+>
+> The final successful run additionally passed **`--cmalign_mxsize 4096`** and a reduced
+> CPU count for `AlignSV`, the settings that got `cmalign` to fit in memory
+> ([`TROUBLESHOOTING.md` §4](TROUBLESHOOTING.md)). **That exact command line is not in
+> any file kept in the project.** Recovering it needs the WSL machine:
+>
+> ```bash
+> cd ~/datos_microbiota_vaginal
+> cat .nextflow/history          # one line per run, with the full command
+> ls -lt .nextflow.log*          # rotated logs
+> ```
+>
+> Until that is done, treat the command below as the *shape* of the invocation, not as
+> the exact reproduction recipe. Tracked in [`../KNOWN_ISSUES.md`](../KNOWN_ISSUES.md).
+
+The command as logged, verbatim, is in
 [`logs/maliampi_launch_command.txt`](../logs/maliampi_launch_command.txt). A
 re-runnable version, with the paths lifted into environment variables, is
 [`workflow/run_maliampi.sh`](../workflow/run_maliampi.sh).
@@ -76,7 +117,7 @@ diversity, KR distance, classify, tables).
 
 | | |
 |---|---|
-| Workflow | `jgolob/maliampi_pplacer`, revision **`3239c625a8`** |
+| Workflow | `maliampi_pplacer`, revision **`3239c625a8`**, **locally modified** — see the box below |
 | Engine | Nextflow **25.04.8** build 5956 |
 | Runtime | Groovy 4.0.26 on OpenJDK 17.0.16 |
 | OS | Linux 6.6.87.2-microsoft-standard-WSL2 (Ubuntu under WSL2 on a Windows host) |
@@ -86,6 +127,32 @@ diversity, KR distance, classify, tables).
 | Tool versions inside containers | pinned by the workflow revision, not by us. The one container tag that appears in our own log is `golob/taxtastic:0.9.5D`. See [`env/VERSIONS.md`](../env/VERSIONS.md) |
 
 Verbatim source: [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_header.txt).
+
+> ### ⚠️ The pipeline was not run stock
+>
+> Two departures from an off-the-shelf `nextflow run`, both of which have to be
+> reproduced or the run cannot be:
+>
+> 1. **Placement uses pplacer, not EPA-NG.** The `maliampi_pplacer` variant was used
+>    instead of the default path, because of a known `gappa` problem inside the EPA-NG
+>    module; using `pplacer_place_classify.nf` is the author's own recommendation.
+> 2. **`main.nf` was edited locally.** In `//Modules`,
+>    `include { epang_place_classify_wf }` was changed to
+>    `include { pplacer_place_classify_wf }`; in *STEP 3. Place and Classify*, the call
+>    `epang_place_classify_wf(sv_fasta, refpkg_tgz, sv_long)` was replaced by
+>    `pplacer_place_classify_wf(sv_fasta, refpkg_tgz, sv_weights, sv_map)`.
+>
+> **The patch itself is not in this repository yet.** It has to be generated on the WSL
+> machine, where the modified file lives:
+>
+> ```bash
+> cd ~/.nextflow/assets/jgolob/maliampi_pplacer
+> git diff main.nf > main.nf.patch     # then commit it to workflow/patches/
+> ```
+>
+> Describing the edit in prose, as above, is a stopgap. Until the patch file is here,
+> `workflow/run_maliampi.sh` will not reproduce this run on a clean machine. Tracked in
+> [`../KNOWN_ISSUES.md`](../KNOWN_ISSUES.md).
 
 ## 5. Execution history
 
@@ -122,8 +189,8 @@ SHA-256, is listed in
 | `placement/pca/epca.*`, `placement/pca/lpca.*` | edge PCA and length PCA projections | 11 MB |
 | `classify/classify.mcc.db` | full classification database | 1.1 GB |
 | `classify/sv_taxonomy.csv` | taxonomy assigned to each SV | 46 MB |
-| `classify/tables/tallies_wide.<rank>.csv` | **taxon × specimen count matrices** | ≤ 251 KB |
-| `classify/tables/by_specimen.<rank>.csv`, `classify/tables/by_taxon.<rank>.csv` | the same tallies in long form | ≤ 665 KB |
+| `classify/tables/tallies_wide.<rank>.csv` | **taxon × specimen matrices of pplacer weights** — see the warning below | ≤ 251 KB |
+| `classify/tables/by_specimen.<rank>.csv`, `classify/tables/by_taxon.<rank>.csv` | the same tallies in long form, with placement frequency | ≤ 665 KB |
 
 Table dimensions, counted directly from the files:
 
@@ -134,6 +201,32 @@ Table dimensions, counted directly from the files:
 
 (`tallies_wide.*` carries three leading columns — `tax_name`, `tax_id`, `rank` — before
 the 111 specimen columns.)
+
+> ### ⚠️ `tallies_wide.*` does not contain read counts
+>
+> The values are **weights redistributed by pplacer** across the taxa a sequence variant
+> could belong to, under the `hybrid2` classifier. Two consequences:
+>
+> - Per-specimen totals in `tallies_wide.*` can **exceed** the DADA2 read counts for that
+>   specimen. This is expected behaviour, not corrupted data.
+> - A histogram of "reads per specimen" built on `tallies_wide.*` is **not** a histogram
+>   of reads. For read counts, use `sv/dada2.specimen.sv.long.csv`.
+>
+> `tallies_wide.species.csv` also carries an unnamed phantom column, an artefact of how
+> the CSV is written. It affects parsing, not integrity.
+
+Counts from the denoising stage, read directly from the outputs:
+
+| | |
+|---|---|
+| Unique sequence variants after chimera removal | **21,382** |
+| Specimen × SV observations with a non-zero count | 177,503 |
+| Total reads after chimera removal | 28,277,142 |
+
+> **These two numbers are easy to confuse, and have been confused before.** 21,382 is the
+> number of *distinct* sequence variants. 177,503 is the number of *specimen–variant
+> pairs* with a non-zero count in the long-format table — roughly eight times larger, and
+> not an ASV count. Where this document says "sequence variants", it means 21,382.
 
 For comparison, the QIIME2/DADA2 table used in the concordance analysis carries **77**
 genera. That gain in resolution is the reason for switching pipelines;

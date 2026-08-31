@@ -21,7 +21,7 @@ column, without access to the sequencing reads.
 | 2 | The **reference-package-building sub-workflow ran end to end**: `RefpkgSearchRepo → FilterSeqInfo → BuildTaxtasticDB → ConfirmSI → RemoveDroppedRecruits → CombinedRefFilter → AlignRepoRecruits → ConvertAlnToFasta → TaxtableForSI → RaxmlTree → RaxmlTree_cleanupInfo → CombineRefpkg_og`. Those twelve processes exist to construct a reference package; a run that consumed a ready-made one would not execute them. | [`logs/maliampi_refpkg_build_processes.txt`](../logs/maliampi_refpkg_build_processes.txt) |
 | 3 | The reference package carries **its own build timestamp**: `metadata.create_date = 2026-02-18 01:11:21`, with an internal log reading `Loaded initial files into empty refpkg` → `Stripped refpkg (removed 0 files)` → `Rerooted`. It was assembled from scratch, not unpacked from a distribution. | [`metadata/refpkg_CONTENTS.json`](../metadata/refpkg_CONTENTS.json) |
 | 4 | The **phylogeny inside it was inferred during the run**, by RAxML 8.2.4 on an alignment of 2,936 distinct patterns (65.12 % gaps/undetermined), GTRGAMMA, one inference from a randomized MP starting tree, fixed seed (`raxmlHPC-PTHREADS-AVX2 -n refpkg -m GTRGAMMA -s recruits.aln.fasta -p 12345 -T 1`). | [`metadata/refpkg_RAxML_info.txt`](../metadata/refpkg_RAxML_info.txt) |
-| 5 | The reference sequences came from a **local ARF release at `~/arf_20200420/dedup/1200bp/named/filtered/`** — full-length, deduplicated, named and outlier-filtered 16S records. Their `download_date` values span **2019-07-12 to 2020-05-04**, consistent with a repository built in 2020. | `references_seq_info.csv` inside the reference package; regenerate with `scripts/describe_refpkg.R` |
+| 5 | The reference sequences came from the **ARF release `arf_20200420`**, downloaded from Zenodo (<https://zenodo.org/records/6876634>) and unpacked at `~/arf_20200420/dedup/1200bp/named/filtered/` — full-length, deduplicated, named and outlier-filtered 16S records. Their `download_date` values span **2019-07-12 to 2020-05-04**, consistent with that release. | `references_seq_info.csv` inside the reference package; regenerate with `scripts/describe_refpkg.R` |
 
 ### Identity of the artifact
 
@@ -84,13 +84,14 @@ the same phylotype space. See
 
 Stated so that a reviewer can attack it rather than take it on trust:
 
-- **If the ARF repository at `~/arf_20200420/` were itself the DREAM distribution**,
-  then our reference package would be a rebuild of the DREAM one rather than an
-  independent one — same inputs, different tree inference run. The conclusion "we
-  built it" would still hold, but the practical distance to the DREAM would be much
-  smaller. *This is not currently established either way*: the provenance of that ARF
-  copy is not recorded in any log we hold. Resolving it is the first task of the next
-  stage.
+- **If the DREAM Challenge built its own reference package from the same ARF release**,
+  then ours and theirs would share their input sequences and differ only in the tree
+  inference run. The conclusion "we built it" would still hold, but the practical
+  distance between the two packages would be much smaller than it looks, and
+  re-placement might buy less than expected. Our side of this is now settled — the
+  sequences came from `arf_20200420` on Zenodo (evidence 5) — but **what the Challenge
+  used is not established**, and cannot be until their reference package, or a
+  description of it, is in hand. That is task 2 of the next stage.
 - **If a reference package had been supplied through a configuration file** rather
   than the command line, the `--` flags above would not show it. Against this: the
   build sub-workflow ran (evidence 2) and the artifact carries a fresh build date

@@ -9,9 +9,15 @@ MaLiAmPi runs every step inside a container whose tag is written into the workfl
 source. We do not choose those tags; the workflow revision does. Pinning the revision
 therefore pins the whole tool chain.
 
+> **The revision alone is not enough here.** The run used the `maliampi_pplacer` variant
+> with a **locally modified `main.nf`** (EPA-NG placement replaced by pplacer). Checking
+> out the revision below gives the unmodified file. The patch is not yet committed — see
+> [`workflow/patches/README.md`](../workflow/patches/README.md) and
+> [`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 2.
+
 | | Value | Verified from |
 |---|---|---|
-| Workflow | `jgolob/maliampi_pplacer` | [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_header.txt) |
+| Workflow | `maliampi_pplacer` (locally modified) | [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_header.txt) |
 | **Revision** | **`3239c625a8`** | same |
 | Nextflow | 25.04.8 build 5956 | same |
 | Groovy / JVM | Groovy 4.0.26 on OpenJDK 17.0.16 | same |

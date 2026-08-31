@@ -25,11 +25,29 @@ ARF="${ARF:-$HOME/arf_20200420}"          # reference sequence repository
 NOTIFY_EMAIL="${NOTIFY_EMAIL:-}"          # optional; leave empty to skip
 
 # --- pinned pipeline -------------------------------------------------------
+# ###########################################################################
+# THIS SCRIPT DOES NOT YET REPRODUCE THE DOCUMENTED RUN. Two gaps, both
+# tracked in ../KNOWN_ISSUES.md:
+#
+#   1. The run used a LOCALLY MODIFIED main.nf (EPA-NG placement swapped for
+#      pplacer). Pulling the revision below gives you the unmodified file. The
+#      patch has to be generated on the machine that holds the modified copy
+#      and committed under workflow/patches/ before this launches the same
+#      pipeline. See docs/RUN_MALIAMPI.md section 4.
+#
+#   2. The successful run also passed --cmalign_mxsize 4096 and reduced the CPU
+#      count for AlignSV, without which cmalign runs out of memory. Those flags
+#      are NOT set below, because the exact values have not been recovered from
+#      .nextflow/history. See docs/TROUBLESHOOTING.md section 4.
+#
+# Fix both before treating this as the reproduction recipe.
+# ###########################################################################
+#
 # NOTE: the original invocation did NOT pass -r; it ran whatever revision the local
 # Nextflow asset happened to be at, which the log records as 3239c625a8. Passing it
 # explicitly here is a deliberate improvement over what was actually run.
-# The revision is what makes this reproducible: it fixes the workflow code and,
-# with it, every container tag the pipeline pulls. Do not drop it.
+# The revision fixes the workflow code and, with it, every container tag the
+# pipeline pulls. Do not drop it.
 WORKFLOW="jgolob/maliampi_pplacer"
 REVISION="3239c625a8"
 

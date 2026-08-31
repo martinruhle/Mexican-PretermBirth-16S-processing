@@ -27,6 +27,10 @@ to the DREAM hispanic subgroup (about 50 participants), and the reverse. That re
 both cohorts to be described in **one** phylotype space. Hence: re-place our sequence
 variants against the DREAM reference package.
 
+This is not an improvised manoeuvre: the Challenge itself added two independent
+validation datasets *post hoc*, after the training set had been built, by placing them on
+the same reference tree. The mechanism needed here is the same one.
+
 ## 2. What this stage does *not* require
 
 - **No re-sequencing and no re-denoising.** The sequence variants already exist
@@ -36,20 +40,55 @@ variants against the DREAM reference package.
 - **No change to the published manuscript.** The published analysis is genus-level and
   stands on the QIIME2 tables. This stage feeds the *next* manuscript.
 
-## 3. Preconditions, in order
+## 3. The direction has to be chosen first
+
+There are two ways to put both cohorts in one feature space. They are **mutually
+exclusive**, and the features they produce **cannot be mixed in the same model**.
+
+**Option A — place our sequence variants on the DREAM reference package.**
+What the objective as currently written asks for. Our data land directly in the
+Challenge's feature space, so the models published with the Challenge apply without
+retraining. Requires obtaining their reference package.
+
+**Option B — place the DREAM sequence variants on our reference package.**
+Does not depend on obtaining anything from the Challenge, but requires their raw
+sequences, part of which are under controlled access, and the results are then **not**
+comparable with the Challenge's published models.
+
+> **This is a live inconsistency in the project's own plans, not a hypothetical.** The
+> earlier plan for the Michigan dataset was Option B — place Michigan on our reference
+> package. The objective as written now is Option A. Changing direction is legitimate;
+> running both and mixing the outputs is not. **Decide which is the main line before any
+> code is written**, and record the decision here.
+
+The rest of this document assumes Option A.
+
+## 4. Preconditions, in order
 
 Each is a separate piece of work with its own product. None has been done.
 
 | # | Task | Product that proves it is done |
 |---|---|---|
-| 1 | Establish where the local ARF copy at `~/arf_20200420/` came from — a public ARF release, a colleague, or a rebuild. This decides how far our reference package really is from the DREAM one. | A section added to [`REFPKG_PROVENANCE.md`](REFPKG_PROVENANCE.md) naming the source, with whatever evidence exists (download URL, README, checksum, correspondence) or an explicit statement that it could not be established. |
+| 1 | Decide between Option A and Option B (§3) and write the decision down, with the reason. | A dated paragraph in this document naming the chosen direction. Nothing else in this table should start before it. |
 | 2 | Obtain the DREAM Challenge reference package. Candidate sources, none yet checked: the Challenge Synapse project (`syn26133770`), the [`maliampi`](https://github.com/jgolob/maliampi) repository and its releases, the supplementary material of Golob et al. 2024 (*Cell Rep Med* 5(1):101359), or a request to the authors. | The archive on disk, plus a row in this document giving origin, retrieval date, version or release tag, and SHA-256. If it turns out not to be distributable, that answer is recorded here instead — a documented dead end closes the objective just as well as a download. |
 | 3 | Compare the two reference packages. | `Rscript scripts/describe_refpkg.R` run on both, outputs saved side by side under `metadata/`, and a short verdict: how many reference sequences each has, how much of the taxonomy they share, and whether re-placement is worth the compute. |
 | 4 | Re-run placement and classification with the DREAM reference package, reusing the existing sequence variants. Confirm the exact parameter name for supplying a pre-built reference package against the workflow source at revision `3239c625a8` before writing the command — our own run never used it. | A second output directory, its own manifest under `metadata/`, and a run record written the same way as [`RUN_MALIAMPI.md`](RUN_MALIAMPI.md). |
-| 5 | Bin the placements into phylotypes at 0.1, 0.5 and 1.0. | Phylotype tables, their dimensions recorded, and the thresholds documented. |
-| 6 | Check that our phylotype identifiers and the DREAM phylotype identifiers actually coincide. | An overlap report: how many phylotypes are shared, what fraction of each cohort's relative abundance falls in the shared set. This is the real gate — steps 4 and 5 can succeed mechanically and still leave the two cohorts in different spaces. |
+| 5 | Bin the placements into phylotypes at 0.1, 0.5 and 1.0 — using the same phylogenetic distance criterion the Challenge used, not our own. | Phylotype tables, their dimensions recorded, and the thresholds documented. |
+| 6 | Assign VALENCIA community state types on the new species tables. | CST assignments, with the VALENCIA commit recorded ([`env/VERSIONS.md`](../env/VERSIONS.md)). CSTs were among the strongest features in the Challenge's winning models, so this is not optional decoration. |
+| 7 | Check that our phylotype identifiers and the DREAM phylotype identifiers actually coincide. | An overlap report: how many phylotypes are shared, what fraction of each cohort's relative abundance falls in the shared set. This is the real gate — steps 4 to 6 can succeed mechanically and still leave the two cohorts in different spaces. |
 
-## 4. Acceptance criteria for the stage as a whole
+### Questions to settle before estimating any timeline
+
+None of these is resolved, and each can block the stage on its own.
+
+| # | Question | How to answer it |
+|---|---|---|
+| 1 | Is the DREAM reference package downloadable at all? | Register on Synapse (`syn26133770`) and look through the project files. The article publishes the MaLiAmPi code, not necessarily the reference package that was built with it. If it is absent, ask the authors, or rebuild it — which is expensive. |
+| 2 | **What data use agreement does Synapse require?** | The Challenge data were aggregated from dbGaP and the March of Dimes database; part of it may need a formal access request with a turnaround of weeks to months. **This is the largest schedule risk in the whole stage, and it is administrative, not technical.** Start it before anything else. |
+| 3 | Are the DREAM FASTQ files needed at all, or do their published feature tables suffice? | If the goal is comparing composition, or validating models, the published phylotype tables may be enough — which removes question 2 entirely. The raw sequences are only needed for Option B. Answering this first may dissolve the biggest risk. |
+| 4 | Does the DREAM reference package cover V3–V4? | Conceptually yes: the tree is built from full-length 16S alleles, which is exactly why harmonising across different variable regions works. Confirm on inspection anyway. |
+
+## 5. Acceptance criteria for the stage as a whole
 
 A colleague should be able to confirm, without asking anyone:
 
@@ -64,7 +103,7 @@ A colleague should be able to confirm, without asking anyone:
 5. The status banner at the top of this file, and the corresponding line in
    [`../README.md`](../README.md), have been updated.
 
-## 5. Known risks
+## 6. Known risks
 
 - **The reference package may not be publicly distributed.** The Challenge released
   phylotype *tables*; whether the reference package itself is available has not been
@@ -75,9 +114,13 @@ A colleague should be able to confirm, without asking anyone:
   too**, not only the phylotypes. If so, the genus-level concordance already
   established for QIIME2 versus MaLiAmPi has to be repeated for the new placement
   before any biological claim is carried over.
+- **Memory, and it will be worse than last time.** Getting `cmalign` to fit took one CPU
+  and `--cmalign_mxsize 4096` on our own reference package
+  ([`TROUBLESHOOTING.md` §4](TROUBLESHOOTING.md)). The DREAM reference package is
+  **larger**, so those settings are a floor, not a recipe. Plan for a machine with more
+  RAM, or a cloud instance, rather than assuming the laptop configuration carries over.
 - **Compute.** Placement is the expensive half of the pipeline. The original run
-  accumulated 970 CPU hours on a laptop; budget accordingly, or move this step to a
-  machine that is not a laptop.
+  accumulated 970 CPU hours on a laptop; budget accordingly.
 
 ---
 

@@ -22,10 +22,12 @@ cleanly.
 
 | If you want to know… | Read |
 |---|---|
+| **How to run MaLiAmPi on a laptop without it dying** | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) |
 | Which reference package our placements were made against, and how we know | [`docs/REFPKG_PROVENANCE.md`](docs/REFPKG_PROVENANCE.md) |
 | What exactly was run, on what, with what, and what it produced | [`docs/RUN_MALIAMPI.md`](docs/RUN_MALIAMPI.md) |
 | Whether MaLiAmPi and QIIME2 see the same microbiome | [`docs/CONCORDANCE_QIIME2_MALIAMPI.md`](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | What comes next and why it has not happened yet | [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
+| What is still unresolved about this run | [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) |
 | Where the actual data is, since it is not here | [`docs/DATA_ACCESS.md`](docs/DATA_ACCESS.md) |
 | Which software versions are pinned, and which are not yet | [`env/VERSIONS.md`](env/VERSIONS.md) |
 
@@ -71,19 +73,24 @@ Nothing in this repository is written as if a pending stage were done. Where a r
 was produced but cannot yet be re-run from here, it says so at the point where the
 result is quoted.
 
+Two gaps are worth knowing before you rely on anything: the exact command of the
+successful run has not been recovered, and the local `main.nf` patch is described but not
+committed. Both are in [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), along with seven more.
+
 ---
 
 ## Layout
 
 ```
-docs/       what was run and what it means; one document per question
-env/        the Nextflow profile and host configuration that were in effect
-workflow/   runnable version of the pipeline invocation, plus the manifest format
-scripts/    small tools: describe a reference package, checksum the outputs
-metadata/   checksums and manifests — small files that identify the large ones
-analysis/   as_run/ = scripts exactly as executed; reproducible reports land here
-results/    aggregated outputs (no participant-level abundances)
-logs/       verbatim excerpts of the run logs, kept as evidence
+docs/            what was run and what it means; one document per question
+KNOWN_ISSUES.md  what is still unresolved
+env/             the Nextflow profile and host configuration that were in effect
+workflow/        pipeline invocation, manifest format, and the local patch it needs
+scripts/         small tools: describe a reference package, checksum the outputs
+metadata/        checksums and manifests — small files that identify the large ones
+analysis/        as_run/ = scripts exactly as executed; reproducible reports land here
+results/         aggregated outputs (no participant-level abundances)
+logs/            verbatim excerpts of the run logs, kept as evidence
 ```
 
 ## Reproducing versus checking
