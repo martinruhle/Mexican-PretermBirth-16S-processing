@@ -96,9 +96,16 @@ Stated so that a reviewer can attack it rather than take it on trust:
   than the command line, the `--` flags above would not show it. Against this: the
   build sub-workflow ran (evidence 2) and the artifact carries a fresh build date
   (evidence 3), neither of which is consistent with consuming a ready-made package.
+  **Checked on 2026-09-24, on the machine that ran:** the workflow version used (tag
+  `v3.5.0`) has no parameter for a ready-made package at all — `main.nf` always calls
+  the build sub-workflow; the only configuration in effect,
+  [`env/nextflow.config`](../env/nextflow.config), holds process resources and Docker
+  options and nothing else; and no session passed `-c`. There was no channel through
+  which a package could have been supplied.
 
-Both checks are cheap and neither has been performed yet. They are recorded as open
-items rather than glossed over.
+The second check is done. The first waits on the DREAM Challenge's reference package,
+which is not published anywhere we could find
+([`NEXT_STAGE_DREAM_REFPKG.md` §3b](NEXT_STAGE_DREAM_REFPKG.md)).
 
 ---
 
@@ -107,6 +114,7 @@ items rather than glossed over.
 | | |
 |---|---|
 | Written | 2026-08-30 |
+| §4, second check completed | 2026-09-26, from evidence gathered on the machine that ran on 2026-09-24 |
 | Based on | the MaLiAmPi run completed 2026-02-18 12:00:03 (`logs/maliampi_run_summary_2026-02-18.txt`) |
 | Reviewed by | *pending* |
 
