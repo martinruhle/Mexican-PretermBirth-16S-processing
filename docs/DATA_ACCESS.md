@@ -23,6 +23,7 @@ themselves.
 | **MaLiAmPi outputs** (sequence variants, placements, classification database, taxon × specimen tables) | Roughly 1.3 GB, regenerable from the reads with [`workflow/run_maliampi.sh`](../workflow/run_maliampi.sh). Identified by SHA-256 in `metadata/maliampi_outputs_manifest.csv` |
 | **The reference package** (`refpkg.tar.gz`, 6.1 MB) | Produced by the same run; SHA-256 `2a3ce022576744c0c0bd858f005db52ab2c27e6ec249a55c56ef3e9c87622b2e`. See [`REFPKG_PROVENANCE.md`](REFPKG_PROVENANCE.md) |
 | **QIIME2 genus tables and clinical metadata** | The analysis compendium, [`Mexican-PretermBirth-analysis`](https://github.com/martinruhle/Mexican-PretermBirth-analysis), and its own `docs/DATA_ACCESS.md` |
+| **The canonical specimen ↔ participant map** (`mapa_muestras_2026-09-20.csv`, 111 rows) | Held with the clinical metadata. Identified here by SHA-256 `3b7e0b31ce6a8634c5951eeac4cf8223adfc8c3bfe00efc51293c272d5df4c91` in [`metadata/maliampi_outputs_manifest.csv`](../metadata/maliampi_outputs_manifest.csv); a local copy under `metadata/` is git-ignored. See [`CONCORDANCE_QIIME2_MALIAMPI.md` §6](CONCORDANCE_QIIME2_MALIAMPI.md) |
 | **ARF reference sequence repository** (`~/arf_20200420/`) | A local copy whose own provenance is not yet established — this is an open item, see [`REFPKG_PROVENANCE.md` §4](REFPKG_PROVENANCE.md) |
 
 ## The rule this repository follows
@@ -45,4 +46,4 @@ published article's data availability statement.
 
 ---
 
-*Last updated 2026-08-30.*
+*Last updated 2026-09-21.*

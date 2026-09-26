@@ -1,0 +1,31 @@
+=== Insumos (SHA-256) ===
+3b7e0b31ce6a8634c5951eeac4cf8223adfc8c3bfe00efc51293c272d5df4c91  mapa_muestras_2026-09-20.csv
+2fe59049cc79c44cccf11b92e4eaae31990fa1431a84e6e4ab270d11d8ffbafe  level-6_vag138.xlsx
+2869dc4a99097c6a61bcde6a92b18cc64f5096b953a4622f4285046dc0bc69fe  genus_rel_filtered_conc_2026-03-06_abs.csv
+2c7d208c295fb65e98c6fb4af5d35f0d5f015481ef63356288e2c4e1771974c6  tallies_wide.genus.csv
+39075a5b5a740dec7774dec6df3e41f66efe53399cc7ed5b9408ce0abc1d2ece  QCS_22Jul24_412.pdf
+3c0b87615efb4359d1bf3aa4a7a49cb9b985a5fdbdec67b9eb77d68cc72b2e8e  metadata_qiime.csv
+
+Mapa canonico: 111 specimens, 110 en analisis; excluidos: Au297
+
+[1] Etiqueta index_original == Au del mapa canonico (via index): 110 / 110
+[2] Filas de la tabla del gate identicas a exactamente una muestra del crudo: 110 / 110 (sin repetir: TRUE)
+    Filas cuyos conteos son de su propia muestra: 106 / 110
+    etiqueta Au52   lleva los conteos de Au197
+    etiqueta Au203  lleva los conteos de Au179
+    etiqueta Au197  lleva los conteos de Au52
+    etiqueta Au179  lleva los conteos de Au203
+    Totales del crudo por Au == mapa$conteos_qiime: TRUE
+
+[3] Spearman(total MaLiAmPi, lecturas del QC del secuenciador), 111 Au: 0.914
+    Cociente MaLiAmPi / lecturas crudas: mediana 0.53, rango 0.25-0.80
+    Spearman(total MaLiAmPi, conteos QIIME2 del mismo Au), 110: 0.9466
+    Spearman(total MaLiAmPi, conteos QIIME2 tal como los aparejo el gate v2): 0.8714
+
+[4] Columnas MaLiAmPi cuyo _S## == posicion en la hoja de muestras del QC: 111 / 111
+    Au122 en MaLiAmPi: Au122_S43
+
+[metadata_qiime.csv] De las 110 muestras en analisis:
+    (participante, visita) distinto del mapa: 30  [otra participante: 12; misma, otra visita: 18]
+    desenlace_parto distinto: 10; pretermino (Preterm/Abortion) invertido: 8
+    Incluye a los excluidos por el mapa: Au297

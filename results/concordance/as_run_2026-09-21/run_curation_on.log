@@ -1,0 +1,83 @@
+CURACION_EXTENDIDA = TRUE 
+
+=== Versiones ===
+R:            R version 4.4.2 (2024-10-31 ucrt) 
+tidyverse:    2.0.0 
+vegan:        2.7.2 
+patchwork:    1.3.2 
+ggrepel:      0.9.6 
+
+>>> Cargando tabla MaLiAmPi...
+  Dimensiones crudas:  547 x 114 
+  Distribucion de rank:
+
+         class         family        family_          genus          order 
+            34             84              1            338             44 
+        order_        order__         phylum          root_       subclass 
+             5              1             27              1              1 
+     subphylum   superkingdom  superkingdom_ superkingdom__ 
+             1              3              6              1 
+  [CURACION_EXTENDIDA] limpieza NCBI aplicada a  29  nombres.
+  [genus]    generos retenidos:  314  | compuestos excluidos:  24 
+  [all_taxa] taxa retenidos:     437  | compuestos excluidos:  109 
+  Muestras MaLiAmPi:  111 
+
+>>> Cargando tabla QIIME2/DADA2...
+  Dimensiones crudas:  110 x 169 
+  Columnas de taxa detectadas:  97 
+  [v3] Filas cuyos conteos eran de otra muestra:  4 (Au52, Au203, Au197, Au179) 
+  [v3] Conteos re-anclados al crudo; totales por muestra == mapa$conteos_qiime
+  Sospechosos de duplicado (terminan en '.1'):  f__Bifidobacteriaceae.1 
+  Taxa con prefijo no-genero (f__/o__/c__/d__/...):  17 
+  [CURACION_EXTENDIDA] SILVA merge 'Mycoplasma' <- Mycoplasma + Mesomycoplasma
+  [CURACION_EXTENDIDA] SILVA merge 'Prevotella' <- Prevotella + Hoylesella + Segatella
+>>> [DIAG H1] Masa no-genero en QIIME2: median = 0.0036, IQR [0.0010, 0.0083]
+    (Comparar contra la brecha de cobertura asimetrica QIIME2 ~= 1 - 0.992 = 0.008)
+  Muestras QIIME2:  110 
+  [genus]    taxa QIIME2:  77 
+  [all_taxa] taxa QIIME2:  94 
+
+
+##############################################################
+### TRACK:  genus 
+##############################################################
+  [genus][OK] 'Escherichia-Shigella' <- suma(Escherichia + Shigella)
+  [genus][OK] 'Fannyhessea' <- suma(Atopobium)
+  QIIME2 taxa totales:             77 
+  QIIME2 con match (incl. curado):  65 
+  QIIME2 sin match:                12 
+  MaLiAmPi taxa totales:           314 
+  MaLiAmPi sin match:              248 
+  Muestras compartidas:  110  | taxa compartidos:  65 
+  Cobertura ASIMETRICA  MaLiAmPi:  median = 0.999, IQR [0.997, 1.000] 
+  Cobertura ASIMETRICA  QIIME2:    median = 0.996, IQR [0.993, 0.999] 
+  Cobertura SIMETRICA   MaLiAmPi:  median = 0.999, IQR [0.997, 1.000] 
+  Cobertura SIMETRICA   QIIME2:    median = 0.996, IQR [0.993, 0.999] 
+1: Removed 9 rows containing missing values or values outside the scale range
+(`geom_point()`). 
+2: Removed 7 rows containing missing values or values outside the scale range
+(`geom_point()`). 
+
+##############################################################
+### TRACK:  all_taxa 
+##############################################################
+  [all_taxa][OK] 'Escherichia-Shigella' <- suma(Escherichia + Shigella)
+  [all_taxa][OK] 'Fannyhessea' <- suma(Atopobium)
+  QIIME2 taxa totales:             94 
+  QIIME2 con match (incl. curado):  65 
+  QIIME2 sin match:                29 
+  MaLiAmPi taxa totales:           437 
+  MaLiAmPi sin match:              371 
+  Muestras compartidas:  110  | taxa compartidos:  65 
+  Cobertura ASIMETRICA  MaLiAmPi:  median = 0.974, IQR [0.948, 0.987] 
+  Cobertura ASIMETRICA  QIIME2:    median = 0.992, IQR [0.985, 0.996] 
+  Cobertura SIMETRICA   MaLiAmPi:  median = 0.974, IQR [0.948, 0.987] 
+  Cobertura SIMETRICA   QIIME2:    median = 0.992, IQR [0.985, 0.996] 
+1: Removed 2 rows containing missing values or values outside the scale range
+(`geom_point()`). 
+2: Removed 7 rows containing missing values or values outside the scale range
+(`geom_point()`). 
+
+>>> Escribiendo reporte...
+
+=== Listo. Outputs en: outputs/gate_qiime2_maliampi ===

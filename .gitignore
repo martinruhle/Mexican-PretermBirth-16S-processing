@@ -4,6 +4,16 @@
 # See docs/DATA_ACCESS.md for where each of these actually lives.
 # ---------------------------------------------------------------------------
 
+# Local working notes for the coding assistant. This repository is public.
+CLAUDE.md
+.claude/
+
+# The canonical specimen <-> participant map carries participant IDs, visits,
+# gestational age and birth outcome: clinical metadata, which does not belong in
+# a public repository (docs/DATA_ACCESS.md). Only its SHA-256 is versioned, in
+# metadata/maliampi_outputs_manifest.csv.
+metadata/mapa_muestras_*.csv
+
 # Sequencing reads and any per-participant abundance table
 *.fastq
 *.fastq.gz

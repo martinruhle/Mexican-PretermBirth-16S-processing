@@ -61,12 +61,13 @@ The FASTQ files are not in this repository and never will be; see
 [`DATA_ACCESS.md`](DATA_ACCESS.md). The raw reads for this cohort are deposited in the
 NCBI Sequence Read Archive under BioProject **PRJNA1440471**.
 
-> **Open item — 111 vs 110.** The MaLiAmPi tables carry 111 specimen columns, while the
+> **Resolved — 111 vs 110.** The MaLiAmPi tables carry 111 specimen columns, while the
 > genus-level analysis matrix used in
 > [`Mexican-PretermBirth-analysis`](https://github.com/martinruhle/Mexican-PretermBirth-analysis)
-> has 110 rows. `failed_specimens.csv` is empty, so nothing failed inside MaLiAmPi: the
-> difference is introduced somewhere in the QIIME2 / decontam / filtering chain, which
-> is not yet documented here. Recorded so that it is not mistaken for a rounding issue.
+> has 110 rows. `failed_specimens.csv` is empty, so nothing failed inside MaLiAmPi. The
+> missing specimen is **Au297**. It has 328 counts in QIIME2, below the 1,000-count filter
+> in `convert_to_relative_abundance.R`, so it is dropped on the QIIME2 side. The canonical
+> specimen map records this ([`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 6).
 
 ---
 

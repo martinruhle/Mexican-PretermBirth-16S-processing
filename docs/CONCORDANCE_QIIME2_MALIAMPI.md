@@ -1,10 +1,15 @@
 # Do QIIME2 and MaLiAmPi describe the same microbiome?
 
-**Status: analysis run and reported; not yet reproducible from this repository.**
-The comparison was carried out on 2026-05-22 and presented at the fourth doctoral
-tutorial. Its outputs are archived here verbatim. What is still missing is the part
-that makes it *reproducible*: a self-contained report with relative paths, a fixed
-seed and a recorded session. See [§5](#5-what-is-still-missing).
+**Status: re-run on 2026-09-21 with every specimen anchored to its own QIIME2 profile
+through the canonical specimen map; not yet reproducible from this repository.**
+The comparison was first run on 2026-05-22 and presented at the fourth doctoral tutorial.
+That run paired specimens by the label column of its QIIME2 table. In the 2026-09-21
+re-run, **four specimens (Au52, Au197, Au179, Au203) are re-anchored to their own QIIME2
+profile** through the canonical specimen map; the other 106 carry the same counts in both
+runs ([§4](#4-four-specimens-re-anchored-to-their-own-qiime2-profile)). The verdict holds
+and every paired statistic rises. Both runs are archived. What is still missing is a
+self-contained report with relative paths, a fixed seed and a recorded session. See
+[§7](#7-what-is-still-missing).
 
 ---
 
@@ -23,7 +28,7 @@ data?*
 ## 2. Design
 
 Both pipelines were reduced to their genus-level count tables over the same 110
-specimens, and compared at four levels, each able to fail independently:
+specimens and compared at four levels. Each level can fail independently:
 
 | Question | Statistic |
 |---|---|
@@ -33,46 +38,56 @@ specimens, and compared at four levels, each able to fail independently:
 | Is the global structure of the specimen space the same? | Mantel test and Procrustes on the distance matrices |
 
 Two tracks were computed: **`genus`** (only taxa resolved to genus) and **`all_taxa`**
-(including material that could not be assigned at genus level), so that the answer does
-not depend on how unassigned mass is treated. Genus names were harmonized before
-matching; that curation is switchable in the script and both variants were reported.
+(also including material that could not be assigned at genus level). That way the answer
+does not depend on how unassigned mass is treated. Genus names were harmonized before
+matching. That curation can be switched on or off in the script, and both variants were
+reported.
 
-## 3. Result, as run on 2026-05-22
+Every statistic above is *paired*: it compares specimen *i* in one pipeline with
+specimen *i* in the other. Pairing is by label, so if a label and the counts under it come
+from different specimens, nothing stops the script: the paired statistics simply measure
+two different specimens against each other and come out lower. §4 describes how each
+pairing is now anchored.
+
+## 3. Result, as re-run on 2026-09-21
 
 Values below are taken verbatim from
-[`results/concordance/as_run_2026-05-22/report_curation_on.md`](../results/concordance/as_run_2026-05-22/report_curation_on.md)
-(genus track, name curation enabled).
+[`results/concordance/as_run_2026-09-21/report_curation_on.md`](../results/concordance/as_run_2026-09-21/report_curation_on.md)
+(genus track, name curation enabled). The May value is shown where it differs.
 
-| | Value |
-|---|---|
-| Genera reported: MaLiAmPi / QIIME2 / **shared** | 314 / 77 / **65** (63 matched directly, 2 through curation; 249 MaLiAmPi-only, 12 QIIME2-only) |
-| Specimens compared | 110 |
-| Share of each specimen's mass carried by the 65 shared genera | MaLiAmPi median **0.999** (IQR 0.997–1.000); QIIME2 median **0.996** (IQR 0.993–0.999) |
-| Spearman per taxon | median **0.529** (IQR 0.396–0.701), n = 50 evaluable; 13 genera above 0.7, 9 below 0.3 |
-| Jaccard, top-5 genera per specimen | median **0.667** |
-| Jaccard, top-10 genera per specimen | median **0.538** |
-| Paired Bray–Curtis | median **0.099** (IQR 0.059–0.156) |
-| Mantel (Spearman) between distance matrices | **r = 0.940**, p = 0.001 |
-| Procrustes | M² = 0.159, **correlation = 0.917**, p = 0.001 |
+| | 2026-09-21 | 2026-05-22 (pairing by label) |
+|---|---|---|
+| Genera reported: MaLiAmPi / QIIME2 / **shared** | 314 / 77 / **65** (63 matched directly, 2 through curation; 248 MaLiAmPi-only, 12 QIIME2-only) | same |
+| Specimens compared | 110 | 110 |
+| Share of each specimen's mass carried by the 65 shared genera | MaLiAmPi median **0.999** (IQR 0.997–1.000); QIIME2 median **0.996** (IQR 0.993–0.999) | same |
+| Spearman per taxon | median **0.585** (IQR 0.418–0.711), n = 50 evaluable; 15 genera above 0.7, 8 below 0.3 | 0.529 (0.396–0.701); 13 above 0.7, 9 below 0.3 |
+| Jaccard, top-5 genera per specimen | median **0.667** | same |
+| Jaccard, top-10 genera per specimen | median **0.538** | same |
+| Paired Bray–Curtis | median **0.099** (IQR 0.058–0.156) | 0.099 (0.059–0.156) |
+| Mantel (Spearman) between distance matrices | **r = 0.958**, p = 0.001 | 0.940 |
+| Procrustes | M² = 0.144, **correlation = 0.925**, p = 0.001 | M² = 0.159, 0.917 |
 
-The `all_taxa` track gives the same picture (coverage 0.974 / 0.992; Spearman median
-0.527; identical per-specimen and global statistics), so the conclusion does not hinge
-on unassigned mass.
+The `all_taxa` track gives the same picture: coverage 0.974 / 0.992, Spearman median
+0.582, and the same per-specimen and global statistics. So the conclusion does not hinge
+on unassigned mass. With curation disabled
+([`report_curation_off.md`](../results/concordance/as_run_2026-09-21/report_curation_off.md))
+the numbers are: Spearman median 0.544 over 46 genera, Bray–Curtis 0.062, Mantel 0.973,
+Procrustes 0.959.
 
 ### Reading
 
 - The 65 shared genera are not a fragment of the data — they carry **more than 99 % of
   the sequenced mass** in both pipelines. The comparison is about the bulk of the
   microbiome, not its tail.
-- **Individual genera agree moderately** (median ρ ≈ 0.53). This is expected: the two
+- **Individual genera agree moderately** (median ρ ≈ 0.59). This is expected: the two
   pipelines use different classification algorithms and different reference databases.
-  It is also a warning with teeth — *Mycoplasma*, the one genus that reached FDR
-  significance in the published analysis, is among the poorly correlated ones. Any
-  claim about a single taxon must be re-checked in both pipelines before it is carried
-  forward.
+  It also comes with a real warning. *Mycoplasma*, the one genus that reached FDR
+  significance in the published analysis, is among the most poorly correlated
+  (ρ = 0.221, 46th of 50; it was 0.248 in May). Any claim about a single taxon must be
+  re-checked in both pipelines before it is carried forward.
 - **Specimens agree well** (Bray–Curtis median 0.099; the top-5 genera coincide in most
   specimens).
-- **The global structure agrees very well** (Mantel 0.94, Procrustes 0.92). The two
+- **The global structure agrees very well** (Mantel 0.96, Procrustes 0.93). The two
   pipelines arrange the 110 specimens in nearly the same configuration.
 
 ### Verdict
@@ -82,38 +97,131 @@ the modelling framework does — **MaLiAmPi is a valid substitute for QIIME2/DAD
 the next stage of the project can proceed on it. For claims about individual taxa,
 agreement must be verified taxon by taxon.
 
-> **Discrepancy on record.** The tutorial slide reports a per-taxon median of 0.51,
-> while the archived report says 0.529 and the spoken commentary said 0.53. The 0.529
-> in the report is the value this repository stands behind; the slide value is not
-> reproducible from the archived outputs. To be resolved when the analysis is ported
-> (§5) — flagged rather than quietly harmonized.
+The verdict is the same as in May. Re-anchoring the four specimens raised every paired
+statistic.
 
-## 4. What was actually run
+## 4. Four specimens re-anchored to their own QIIME2 profile
+
+### The mechanism
+
+The May script pairs specimens **by name**. On the MaLiAmPi side it takes the column name
+without its `_S##` suffix. On the QIIME2 side it takes the column `index_original` of
+`genus_rel_filtered_conc_2026-03-06_abs.csv`. All 110 of those labels agree with the
+canonical specimen map ([§6](#6-sample-linkage-the-canonical-map)). In **4 rows the 97
+counts under the label are those of the other member of a pair**, in two pairs:
+
+| Label in the QIIME2 table | Specimen whose counts that row holds |
+|---|---|
+| Au52 | Au197 |
+| Au197 | Au52 |
+| Au179 | Au203 |
+| Au203 | Au179 |
+
+In the May run, then, these four MaLiAmPi profiles were compared with the QIIME2 profile of
+their pair partner. The other 106 rows hold their own specimen's counts, and they are
+identical in both runs. The re-run takes each specimen's QIIME2 counts from the raw QIIME2
+export, through the canonical map, so every row is anchored to its own specimen.
+
+### How it was established
+
+[`analysis/as_run/verify_sample_pairing_2026-09-21.R`](../analysis/as_run/verify_sample_pairing_2026-09-21.R),
+output in
+[`pairing_verification.log`](../results/concordance/as_run_2026-09-21/pairing_verification.log).
+None of the tests relies on a label typed by hand:
+
+1. **Count fingerprint.** Each of the 110 rows of the May QIIME2 input is identical,
+   count for count, to exactly one specimen in the raw QIIME2 export
+   (`level-6_vag138.xlsx`, rows named by QIIME2's own sample IDs). 106 match their own
+   label and 4 match their pair partner.
+2. **Sequencing depth.** Across the 111 specimens, the MaLiAmPi total per specimen tracks
+   the sequencer's read count for the same Au### in the QC report (Spearman 0.914; the
+   MaLiAmPi / raw ratio stays between 0.25 and 0.80, with no outlier). It also tracks the
+   QIIME2 count for the same Au### (0.947). With the pairing the May run used, that
+   second correlation drops to 0.871. For example, MaLiAmPi's Au197 has 441,632 reads and
+   was paired with a QIIME2 profile of 15,515 counts, when its own profile has 63,110.
+3. **Sample-sheet position.** All 111 MaLiAmPi column suffixes `_S##` equal the
+   specimen's position in the sequencer's sample sheet (QC report). The MaLiAmPi side of
+   the join is therefore anchored to the sequencer, not to a table.
+4. **Composition.** For the four affected specimens, the paired Bray–Curtis drops from
+   0.27 / 0.09 / 0.57 / 0.46 (Au52 / Au197 / Au179 / Au203, May) to 0.17 / 0.05 / 0.17 /
+   0.20 against their own QIIME2 profile.
+
+### What changed, and what did not
+
+Only the paired statistics could change, and they all rose: median Spearman ρ 0.529 →
+0.585, Mantel 0.940 → 0.958, Procrustes 0.917 → 0.925, genera above ρ 0.7 from 13 to 15.
+Taxon sets, shared genera and coverage cannot depend on the pairing, and they are
+identical. Most of the per-taxon change sits in rare genera (QIIME2 prevalence 3–6 %:
+*Solobacterium*, *Afipia*, *Schaalia*), where a single specimen that carries the genus,
+compared against another specimen's profile, is enough to move ρ. The median change per
+genus is +0.004.
+
+To make sure no other difference is mixed in, the unmodified May script was re-run on
+2026-09-21 on its original input. It reproduced the archived May report and tables **byte
+for byte**. The only difference between the two archived runs is therefore the four
+re-anchored rows.
+
+> **Discrepancy on record, now likely explained.** The tutorial slide reported a per-taxon
+> median of 0.51, while the May report says 0.529 (curation on). The May run **with
+> curation off** gives 0.506, which rounds to 0.51. The slide most likely quoted the
+> curation-off variant. Both May values are superseded by 0.585 / 0.544.
+
+## 5. What was actually run
 
 | | |
 |---|---|
-| Script | [`analysis/as_run/gate_qiime2_maliampi_v2.R`](../analysis/as_run/gate_qiime2_maliampi_v2.R) — kept verbatim, absolute paths and all, because it is the evidence of what produced the numbers above |
-| MaLiAmPi input | `classify/tables/tallies_wide.genus.csv` from the run documented in [`RUN_MALIAMPI.md`](RUN_MALIAMPI.md) |
-| QIIME2 input | `genus_rel_filtered_conc_2026-03-06_abs.csv` — **note: not the same file as the matrix behind the published manuscript** (`genus_rel_filtered_2025-05-25_abs.csv`). Which processing steps separate the two is not documented anywhere yet; see §5 |
-| Date | 2026-05-22 |
-| Outputs | [`results/concordance/as_run_2026-05-22/`](../results/concordance/as_run_2026-05-22/) — two reports, per-track tables, four figures per track |
-| Earlier version | [`analysis/as_run/gate_qiime2_maliampi_v1.R`](../analysis/as_run/gate_qiime2_maliampi_v1.R), superseded; kept for history |
+| Script | [`analysis/as_run/gate_qiime2_maliampi_v3.R`](../analysis/as_run/gate_qiime2_maliampi_v3.R). It is v2 with one change: block 4a replaces the QIIME2 counts of each row with the raw QIIME2 counts of the specimen the canonical map assigns to it, and stops if any label disagrees with the map. Names, curation, seed and metrics are unchanged. Kept verbatim, absolute paths and all |
+| MaLiAmPi input | `classify/tables/tallies_wide.genus.csv`, SHA-256 `2c7d208c…` (in [`metadata/maliampi_outputs_manifest.csv`](../metadata/maliampi_outputs_manifest.csv)) |
+| QIIME2 counts | `level-6_vag138.xlsx`, the raw QIIME2 genus-level (level-6) export, SHA-256 `2fe59049cc79c44cccf11b92e4eaae31990fa1431a84e6e4ab270d11d8ffbafe` |
+| Specimen linkage | `mapa_muestras_2026-09-20.csv`, SHA-256 `3b7e0b31…` (in the manifest; see §6) |
+| QIIME2 taxon names and row labels | `genus_rel_filtered_conc_2026-03-06_abs.csv`, SHA-256 `2869dc4a99097c6a61bcde6a92b18cc64f5096b953a4622f4285046dc0bc69fe`. It is read for its column names and labels only. Its counts are replaced. It is **not** the matrix behind the published manuscript (`genus_rel_filtered_2025-05-25_abs.csv`) |
+| Environment | R 4.4.2, tidyverse 2.0.0, vegan 2.7.2, patchwork 1.3.2, ggrepel 0.9.6 — recorded in [`run_curation_on.log`](../results/concordance/as_run_2026-09-21/run_curation_on.log) |
+| Date | 2026-09-21. Curation on and curation off, selected with `GATE_CURACION_EXTENDIDA` |
+| Outputs | [`results/concordance/as_run_2026-09-21/`](../results/concordance/as_run_2026-09-21/): two reports, per-track tables, four figures per track, the run log and the pairing verification log |
+| Superseded | [`gate_qiime2_maliampi_v2.R`](../analysis/as_run/gate_qiime2_maliampi_v2.R) → [`as_run_2026-05-22/`](../results/concordance/as_run_2026-05-22/) (pairing by label, before the four specimens were re-anchored; kept as history), and `gate_qiime2_maliampi_v1.R` before it |
 
-## 5. What is still missing
+## 6. Sample linkage: the canonical map
+
+The link from a specimen (`Au###`) to a participant, visit and outcome has **one**
+source: `mapa_muestras_2026-09-20.csv`. It has 111 rows, one per sequenced specimen, with
+the columns `Au`, `index`, `id`, `visita`, `sdg_visita`, `desenlace_parto`,
+`lecturas_crudas`, `conteos_qiime`, `conc_biblioteca_ng_ul`, `en_analisis`, `motivo`. It
+was built by matching count fingerprints against the raw QIIME2 export, and checked
+against the validated clinical table and the two QC reports (library concentration,
+sequencing). 110 specimens are in the analysis. Au297 is excluded (328 QIIME2 counts,
+below the 1,000-count filter).
+
+- It is clinical metadata, so it is **not in this repository**. A local copy lives at
+  `metadata/mapa_muestras_2026-09-20.csv` and is git-ignored. Its SHA-256
+  (`3b7e0b31ce6a8634c5951eeac4cf8223adfc8c3bfe00efc51293c272d5df4c91`) is recorded in the
+  output manifest, so anyone holding a copy can confirm it is this one.
+- To join a MaLiAmPi table to it, strip `_S\d+$` from the column names. The suffix is the
+  sample-sheet position (verified for all 111) and carries no other information.
+- **Do not take the linkage from anywhere else.** In particular, not from
+  `metadata_qiime.csv` (reassigns 30 of the 110 specimens;
+  [`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 10), not from the counts of
+  `genus_rel_filtered_conc_2026-03-06_abs.csv` (§4), and not from its `[BIB](ng/ul)1`
+  column (item 11).
+
+## 7. What is still missing
 
 The analysis exists; the *reproducible* analysis does not. To close it:
 
 1. **Port the script to a self-contained report** (`analysis/concordance_qiime2_maliampi.Rmd`)
    with no absolute paths and no `setwd()`, inputs resolved relative to the project
-   root, a fixed seed, and `sessionInfo()` printed at the end.
+   root, a fixed seed, and `sessionInfo()` printed at the end. It should read the QIIME2
+   counts from the raw export and the linkage from the canonical map, as v3 does.
 2. **Render it** to `analysis/concordance_qiime2_maliampi.html` and commit both.
-3. **Reproduce the archived numbers.** The report in
-   `results/concordance/as_run_2026-05-22/` is the target: the ported version must
-   return the same 65 shared genera, the same median ρ = 0.529, the same Mantel 0.940
-   and Procrustes 0.917. A difference is an investigation, not noise.
-4. **Write down the QIIME2 input chain** — which file, produced by which steps, from
-   which QIIME2 artifacts — so that the `_conc_2026-03-06` versus `2025-05-25`
-   difference stops being an unexplained detail.
+3. **Reproduce the archived numbers.** The target is now
+   `results/concordance/as_run_2026-09-21/`. The ported version must return the same 65
+   shared genera, the same median ρ = 0.585, the same Mantel 0.958 and Procrustes 0.925.
+   A difference is an investigation, not noise.
+4. **The QIIME2 input chain, as far as the gate is concerned, is settled.** Once
+   re-anchored, the gate's QIIME2 counts are exactly the raw QIIME2 export's counts for
+   all 110 specimens: no decontam or filtering touched them. What remains undocumented is
+   how the manuscript's matrices were derived from that export
+   ([`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 7). That belongs to the analysis
+   compendium.
 5. **Settle the name curation.** The script carries a flag
    (`CURACION_EXTENDIDA`) that merges *Mycoplasma* with *Mesomycoplasma*, *Prevotella*
    with *Hoylesella* and *Segatella*, and *Atopobium* into *Fannyhessea*, and strips
@@ -128,5 +236,6 @@ above; see [`DATA_ACCESS.md`](DATA_ACCESS.md).
 | | |
 |---|---|
 | Written | 2026-08-30 |
-| Analysis run | 2026-05-22 |
+| Pairing verified, re-run | 2026-09-21 |
+| First run | 2026-05-22 |
 | Reviewed by | *pending* |

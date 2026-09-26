@@ -49,11 +49,16 @@ the 77 genera in the QIIME2 table used for the comparison.
 
 **3. The two pipelines describe the same microbiome where it matters.**
 The 65 genera both pipelines report carry over 99 % of the sequenced mass in each.
-Global structure agrees closely (Mantel 0.940, Procrustes 0.917, both p = 0.001) and
+Global structure agrees closely (Mantel 0.958, Procrustes 0.925, both p = 0.001) and
 specimens agree well (paired Bray–Curtis median 0.099). Individual genera agree only
-moderately (median Spearman ρ = 0.529) — including *Mycoplasma*, the one genus that
-reached FDR significance in the published analysis — so single-taxon claims must be
-re-checked in both pipelines before being carried forward.
+moderately (median Spearman ρ = 0.585). *Mycoplasma*, the one genus that reached FDR
+significance in the published analysis, is among the worst (ρ = 0.221), so single-taxon
+claims must be re-checked in both pipelines before being carried forward.
+These are the 2026-09-21 figures, from a re-run in which every specimen is anchored to
+its own QIIME2 profile through the canonical specimen map. Relative to the first run
+(2026-05-22), four specimens (Au52, Au197, Au179, Au203) are re-anchored, which moves
+median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values above
+([`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §4](docs/CONCORDANCE_QIIME2_MALIAMPI.md)).
 
 ---
 
@@ -63,7 +68,8 @@ re-checked in both pipelines before being carried forward.
 |---|---|
 | MaLiAmPi run on the Mexican cohort | ✅ complete (2026-02-18), documented here |
 | Provenance of the reference package | ✅ established |
-| QIIME2 ↔ MaLiAmPi concordance | ⚠️ analysed and archived, **not yet reproducible from this repository** — see [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §5](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
+| Specimen ↔ participant linkage | ✅ one canonical map, identified by SHA-256; every MaLiAmPi ↔ QIIME2 pairing verified (2026-09-21) — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §6](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
+| QIIME2 ↔ MaLiAmPi concordance | ⚠️ re-run and archived, **not yet reproducible from this repository** — see [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | Software environment for the downstream tooling | ⚠️ partially pinned — [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Phylotype binning (0.1 / 0.5 / 1.0) | 🚧 not started |
 | **Re-placement against the DREAM Challenge reference package** | 🚧 **not started** — [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
@@ -75,7 +81,7 @@ result is quoted.
 
 Two gaps are worth knowing before you rely on anything: the exact command of the
 successful run has not been recovered, and the local `main.nf` patch is described but not
-committed. Both are in [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), along with seven more.
+committed. Both are in [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), along with six more open ones.
 
 ---
 
@@ -135,4 +141,4 @@ Licensed MIT — see [`LICENSE`](LICENSE).
 
 ---
 
-*Last updated 2026-08-30.*
+*Last updated 2026-09-21.*

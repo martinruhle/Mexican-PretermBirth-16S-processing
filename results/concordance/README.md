@@ -4,12 +4,32 @@ Read [`docs/CONCORDANCE_QIIME2_MALIAMPI.md`](../../docs/CONCORDANCE_QIIME2_MALIA
 first; it states the question, the design and the verdict. This directory holds the
 numbers behind it.
 
-## `as_run_2026-05-22/`
+## `as_run_2026-09-21/` — current
+
+The outputs exactly as produced on 2026-09-21 by
+[`analysis/as_run/gate_qiime2_maliampi_v3.R`](../../analysis/as_run/gate_qiime2_maliampi_v3.R),
+copied here unchanged. These results use the canonical specimen map, with every
+MaLiAmPi ↔ QIIME2 pairing verified. They are the **target** that the forthcoming
+reproducible report has to reproduce, in the same way a baseline is kept before a
+refactor.
+
+Same layout as the May directory below, plus two logs:
+
+| Path | Contents |
+|---|---|
+| `run_curation_on.log` | console output of the curation-on run, with package versions and the four re-anchored rows (R's "built under" warnings stripped) |
+| `pairing_verification.log` | output of [`verify_sample_pairing_2026-09-21.R`](../../analysis/as_run/verify_sample_pairing_2026-09-21.R): input hashes, then the four checks (label, count fingerprint, sequencing depth, sample-sheet position). Counts and specimen IDs only, with no participant, visit or outcome |
+
+## `as_run_2026-05-22/` — superseded, kept as history
 
 The outputs exactly as produced on 2026-05-22 by
 [`analysis/as_run/gate_qiime2_maliampi_v2.R`](../../analysis/as_run/gate_qiime2_maliampi_v2.R),
-copied here unchanged. They are the **target** that the forthcoming reproducible report
-has to reproduce, in the same way a baseline is kept before a refactor.
+copied here unchanged. **Its pairing is by label, and in 4 of the 110 specimens the QIIME2
+row under the label holds the pair partner's counts** (Au52 ↔ Au197, Au179 ↔ Au203);
+`as_run_2026-09-21/` re-anchors those four to their own profile. See
+[`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §4](../../docs/CONCORDANCE_QIIME2_MALIAMPI.md).
+Re-running v2 unchanged on 2026-09-21 reproduced these files byte for byte, so they are a
+faithful record of that run.
 
 | Path | Contents |
 |---|---|
@@ -27,7 +47,8 @@ or one derived statistic per specimen. See
 
 ## What will land next to it
 
-`analysis/concordance_qiime2_maliampi.Rmd` and its rendered HTML, with relative paths,
+`analysis/concordance_qiime2_maliampi.Rmd` and its rendered HTML, which must reproduce
+`as_run_2026-09-21/`, with relative paths,
 a fixed seed and `sessionInfo()`, plus the aggregated table it produces. Until that
 exists, this analysis is documented and archived but **not reproducible from this
 repository** — the distinction is deliberate and is stated wherever the results are
