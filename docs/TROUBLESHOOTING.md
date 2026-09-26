@@ -30,7 +30,7 @@ which is the one that genuinely needs it.
 **Cost — this one is not free.** DADA2 learns its error model **per batch**. Twelve
 artificial batches means twelve error models estimated from 9–10 specimens each, rather
 than one estimated from 111. The error model is correspondingly less well determined.
-Nothing about the within-batch learning is wrong, but the run is not equivalent to a
+The within-batch learning is sound in itself, but the run is not equivalent to a
 single-batch run, and any comparison against a study that denoised in one pass should
 say so.
 
@@ -46,8 +46,9 @@ of the memory workaround. This is flagged again in
 
 **Cause.** `arf_2020420` instead of `arf_20200420` — one missing zero.
 
-**Fix.** Correct the path. Recorded because the failure surfaces as a tool error deep
-inside a sub-workflow rather than as "file not found", which costs time to diagnose.
+**Fix.** Use the full name, `arf_20200420`. Recorded because the failure surfaces as a
+message from a tool deep inside a sub-workflow rather than as "file not found", which
+costs time to diagnose.
 
 ## 3. NCBI taxonomy incompatible with `taxtastic`
 
@@ -66,15 +67,15 @@ The same failure appeared in another iteration as `ValueError: 'domain' is not i
 0.9.5D expects the previous structure and has no rank named `cellular_root` (or
 `domain`) in its ordered list.
 
-**Complication worth knowing about.** Nextflow's cache kept reusing the broken
-`taxonomy.db` even after the task's work directory was deleted. **Deleting a task's
-`workDir` does not invalidate its cache entry** — the entry is keyed on the inputs, not
-on the presence of the outputs.
+**Complication worth knowing about.** Nextflow's cache kept reusing the `taxonomy.db`
+built from the newer `taxdmp.zip` even after the task's work directory was deleted.
+**Deleting a task's `workDir` does not remove its cache entry** — the entry is keyed on
+the inputs, not on the presence of the outputs.
 
 **Fix.** Supply a compatible taxonomy explicitly, via `--taxdmp`, using the 2020-vintage
 `taxdmp.zip` distributed with `arf_20200420`. Adding a parameter changes the input hash,
-which is what actually forces the step to re-run. That is the correct way to invalidate
-a Nextflow cache entry; `rm -rf` on the work directory is not.
+which is what actually forces the step to re-run. Changing an input is how a Nextflow
+cache entry stops being reused; `rm -rf` on the work directory does not do it.
 
 This is also why `--taxdmp` appears in the launch command at all, and it is part of the
 evidence that the reference package was built rather than downloaded
@@ -90,10 +91,16 @@ scales with the number of CPUs, not just with the data. More CPUs made it worse.
 
 **Fix.** One CPU for `AlignSV`, and `--cmalign_mxsize 4096`.
 
-**Caveat.** These two values come from the working history of the project and are **not**
-present in the Nextflow log that survives. They should be confirmed against
-`.nextflow/history` on the WSL machine before anyone relies on them — see
-[`../KNOWN_ISSUES.md`](../KNOWN_ISSUES.md).
+**Both values are now verified** (2026-09-24, on the WSL machine), and they are set in
+two different places, which is worth knowing before you try to reproduce this:
+
+- `--cmalign_mxsize 4096` is a **command-line flag**, present in the final session's
+  invocation ([`logs/maliampi_launch_command_final_2026-02-18.txt`](../logs/maliampi_launch_command_final_2026-02-18.txt)).
+- The single CPU is **not a flag**. `AlignSV` declares `label = 'mem_veryhigh'`, and the
+  `standard` profile caps that label at `cpus = 1, memory = 9.GB`
+  ([`env/nextflow.config`](../env/nextflow.config)). Launching without that config, or
+  under a profile that maps the label differently, silently gives `cmalign` more threads
+  — the setting under which it ran out of memory.
 
 **Forward-looking consequence.** The DREAM Challenge reference package is larger than
 ours. If the sequence variants are re-placed against it

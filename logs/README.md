@@ -5,7 +5,8 @@ traced to one of these files.
 
 | File | What it is | Cut from |
 |---|---|---|
-| `maliampi_launch_command.txt` | the exact `nextflow run` command line, verbatim | first line of the Nextflow debug log |
+| `maliampi_launch_command_final_2026-02-18.txt` | the `nextflow run` command line of the **final, successful** session, verbatim | first line of `~/datos_microbiota_vaginal/.nextflow.log` on the WSL machine, recovered 2026-09-24 |
+| `maliampi_launch_command.txt` | the command line of the Nov-06 session, which failed; kept as evidence of that session | first line of the Nextflow debug log |
 | `nextflow_runtime_header.txt` | engine version, workflow revision, session id, host and resources | Nextflow debug log |
 | `maliampi_refpkg_build_processes.txt` | the twelve processes of the reference-package-building sub-workflow | final run trace |
 | `maliampi_run_summary_2026-02-18.txt` | full process table and completion trailer of the final session | tail of `nohup.out` |

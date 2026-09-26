@@ -24,7 +24,7 @@ themselves.
 | **The reference package** (`refpkg.tar.gz`, 6.1 MB) | Produced by the same run; SHA-256 `2a3ce022576744c0c0bd858f005db52ab2c27e6ec249a55c56ef3e9c87622b2e`. See [`REFPKG_PROVENANCE.md`](REFPKG_PROVENANCE.md) |
 | **QIIME2 genus tables and clinical metadata** | The analysis compendium, [`Mexican-PretermBirth-analysis`](https://github.com/martinruhle/Mexican-PretermBirth-analysis), and its own `docs/DATA_ACCESS.md` |
 | **The canonical specimen ↔ participant map** (`mapa_muestras_2026-09-20.csv`, 111 rows) | Held with the clinical metadata. Identified here by SHA-256 `3b7e0b31ce6a8634c5951eeac4cf8223adfc8c3bfe00efc51293c272d5df4c91` in [`metadata/maliampi_outputs_manifest.csv`](../metadata/maliampi_outputs_manifest.csv); a local copy under `metadata/` is git-ignored. See [`CONCORDANCE_QIIME2_MALIAMPI.md` §6](CONCORDANCE_QIIME2_MALIAMPI.md) |
-| **ARF reference sequence repository** (`~/arf_20200420/`) | A local copy whose own provenance is not yet established — this is an open item, see [`REFPKG_PROVENANCE.md` §4](REFPKG_PROVENANCE.md) |
+| **ARF reference sequence repository** (release `arf_20200420`) | Zenodo, <https://zenodo.org/records/6876634>. The archive as downloaded (`arf_20200420.tgz`, 998,142,756 bytes) and its unpacked copy (`~/arf_20200420/`) are on the machine that ran the pipeline. The release is identified in [`REFPKG_PROVENANCE.md` §1, evidence 5](REFPKG_PROVENANCE.md): the `download_date` values of the sequences inside our reference package span 2019-07-12 to 2020-05-04, consistent with that release |
 
 ## The rule this repository follows
 
@@ -46,4 +46,4 @@ published article's data availability statement.
 
 ---
 
-*Last updated 2026-09-21.*
+*Last updated 2026-09-26.*

@@ -73,40 +73,37 @@ NCBI Sequence Read Archive under BioProject **PRJNA1440471**.
 
 ## 3. What was run
 
-> ### ⚠️ The command below is from a session that failed, not from the final one
->
-> The only Nextflow log kept in the project is the one from `Nov-06`, session
-> `jovial_mercator`, and that session **failed** at `make_refpkg_wf:TaxtableForSI`. The
-> command recorded in it is the one shown here.
->
-> The final successful run additionally passed **`--cmalign_mxsize 4096`** and a reduced
-> CPU count for `AlignSV`, the settings that got `cmalign` to fit in memory
-> ([`TROUBLESHOOTING.md` §4](TROUBLESHOOTING.md)). **That exact command line is not in
-> any file kept in the project.** Recovering it needs the WSL machine:
->
-> ```bash
-> cd ~/datos_microbiota_vaginal
-> cat .nextflow/history          # one line per run, with the full command
-> ls -lt .nextflow.log*          # rotated logs
-> ```
->
-> Until that is done, treat the command below as the *shape* of the invocation, not as
-> the exact reproduction recipe. Tracked in [`../KNOWN_ISSUES.md`](../KNOWN_ISSUES.md).
-
-The command as logged, verbatim, is in
-[`logs/maliampi_launch_command.txt`](../logs/maliampi_launch_command.txt). A
-re-runnable version, with the paths lifted into environment variables, is
+This is the command of the **final, successful session** (`serene_gautier`, completed
+18-Feb-2026 12:00:03), recovered from the WSL machine on 2026-09-24 and kept verbatim in
+[`logs/maliampi_launch_command_final_2026-02-18.txt`](../logs/maliampi_launch_command_final_2026-02-18.txt).
+A re-runnable version, with the paths lifted into environment variables, is
 [`workflow/run_maliampi.sh`](../workflow/run_maliampi.sh).
 
 ```
-nextflow run jgolob/maliampi_pplacer -profile standard -resume
+nextflow run ~/.nextflow/assets/jgolob/maliampi_pplacer -profile standard -resume
   -w $WORK_DIR
   --manifest $MANIFEST
   --output $OUTPUT_DIR
+  --email <redacted>
   --repo_fasta $ARF/dedup/1200bp/named/filtered/seqs.fasta
   --repo_si    $ARF/dedup/1200bp/named/filtered/seq_info.csv
   --taxdmp     $ARF/taxdmp.zip
+  --cmalign_mxsize 4096
 ```
+
+Three things this command settles, each of which used to be an open question:
+
+- It ran a **local directory**, not a pulled project. That directory is a clone of
+  `github.com/jgolob/maliampi` at tag `v3.5.0`, with `main.nf` patched (§4).
+- `--cmalign_mxsize 4096` was indeed passed. The reduced CPU count for `AlignSV` was
+  **not** a flag: it is the `mem_veryhigh` process label, which
+  [`env/nextflow.config`](../env/nextflow.config) caps at 1 CPU and 9 GB.
+- The earlier `Nov-06` session, whose command is in
+  [`logs/maliampi_launch_command.txt`](../logs/maliampi_launch_command.txt), differs only
+  in lacking that flag — and it failed.
+
+`~/.nextflow/history` on that machine is empty, which is why this took a second look;
+the rotated `.nextflow.log*` files in the run directory are what hold the record.
 
 Sub-workflows executed: `preprocess_wf` (barcodecop, FastQC, TrimGalore) →
 `dada2_wf` (filter and trim, dereplicate, per-batch error model, denoise, merge,
@@ -118,14 +115,14 @@ diversity, KR distance, classify, tables).
 
 | | |
 |---|---|
-| Workflow | `maliampi_pplacer`, revision **`3239c625a8`**, **locally modified** — see the box below |
+| Workflow | `github.com/jgolob/maliampi` at tag **`v3.5.0`** (commit `333d83ba9881…`), **locally modified** — see the box below. Nextflow logs it as `jgolob/maliampi_pplacer`, which is only the local directory name |
 | Engine | Nextflow **25.04.8** build 5956 |
 | Runtime | Groovy 4.0.26 on OpenJDK 17.0.16 |
 | OS | Linux 6.6.87.2-microsoft-standard-WSL2 (Ubuntu under WSL2 on a Windows host) |
 | Executor | `local`, Docker enabled (`-u 1000:1000`) |
 | Resources | 6 CPUs, 11.7 GB RAM, 8 GB swap (see [`env/wslconfig.txt`](../env/wslconfig.txt)) |
 | Process profile | `standard` — per-label CPU and memory caps in [`env/nextflow.config`](../env/nextflow.config) |
-| Tool versions inside containers | pinned by the workflow revision, not by us. The one container tag that appears in our own log is `golob/taxtastic:0.9.5D`. See [`env/VERSIONS.md`](../env/VERSIONS.md) |
+| Tool versions inside containers | pinned by the workflow source, not by us. All seventeen tags were read off the pinned commit on 2026-09-24 and are listed in [`env/VERSIONS.md`](../env/VERSIONS.md) |
 
 Verbatim source: [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_header.txt).
 
@@ -143,17 +140,15 @@ Verbatim source: [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_h
 >    `epang_place_classify_wf(sv_fasta, refpkg_tgz, sv_long)` was replaced by
 >    `pplacer_place_classify_wf(sv_fasta, refpkg_tgz, sv_weights, sv_map)`.
 >
-> **The patch itself is not in this repository yet.** It has to be generated on the WSL
-> machine, where the modified file lives:
+> The patch is committed: [`workflow/patches/main.nf.pplacer.patch`](../workflow/patches/main.nf.pplacer.patch),
+> generated with `git diff main.nf` on the WSL machine on 2026-09-24 (4 lines added, 3
+> removed). To reproduce the pipeline:
 >
 > ```bash
-> cd ~/.nextflow/assets/jgolob/maliampi_pplacer
-> git diff main.nf > main.nf.patch     # then commit it to workflow/patches/
+> git clone https://github.com/jgolob/maliampi.git
+> git -C maliampi checkout v3.5.0
+> git -C maliampi apply workflow/patches/main.nf.pplacer.patch
 > ```
->
-> Describing the edit in prose, as above, is a stopgap. Until the patch file is here,
-> `workflow/run_maliampi.sh` will not reproduce this run on a clean machine. Tracked in
-> [`../KNOWN_ISSUES.md`](../KNOWN_ISSUES.md).
 
 ## 5. Execution history
 

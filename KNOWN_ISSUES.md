@@ -10,40 +10,35 @@ Items are closed by editing this file and the document that carries the claim.
 
 ## 1. The exact command of the successful run has not been recovered
 
-**Status:** open. **Blocks:** exact reproduction of the run.
+**Status:** resolved 2026-09-24.
 
-The only Nextflow log kept in the project is from the `Nov-06` session
-(`jovial_mercator`), which **failed** at `make_refpkg_wf:TaxtableForSI`. The final
-successful run additionally passed `--cmalign_mxsize 4096` and a reduced CPU count for
-`AlignSV`, but that command line is not in any file we hold.
-
-To close it, on the WSL machine:
-
-```bash
-cd ~/datos_microbiota_vaginal
-cat .nextflow/history      # one line per run, with the full command
-ls -lt .nextflow.log*
-```
-
-Then replace the command in [`docs/RUN_MALIAMPI.md`](docs/RUN_MALIAMPI.md) and in
-[`workflow/run_maliampi.sh`](workflow/run_maliampi.sh), and drop the warning boxes.
+`~/.nextflow/history` is empty on the WSL machine, which is why the earlier attempt
+found nothing. The record is in the rotated logs of the run directory. The final
+session (`serene_gautier`, 18-Feb-2026 11:54:13 → 12:00:03, "Execution complete") is
+kept verbatim in
+[`logs/maliampi_launch_command_final_2026-02-18.txt`](logs/maliampi_launch_command_final_2026-02-18.txt),
+and quoted in [`docs/RUN_MALIAMPI.md` §3](docs/RUN_MALIAMPI.md). It differs from the
+failed `Nov-06` session by one flag: `--cmalign_mxsize 4096`.
 
 ## 2. The `main.nf` patch is described in prose, not committed
 
-**Status:** open. **Blocks:** running the pipeline from a clean checkout.
+**Status:** resolved 2026-09-24.
 
-The run used a locally modified `main.nf` (EPA-NG placement swapped for pplacer). The
-change is written out in [`docs/RUN_MALIAMPI.md` §4](docs/RUN_MALIAMPI.md), but the patch
-file itself lives only on the WSL machine. Generate it with `git diff main.nf` in
-`~/.nextflow/assets/jgolob/maliampi_pplacer` and commit it under `workflow/patches/`.
+[`workflow/patches/main.nf.pplacer.patch`](workflow/patches/main.nf.pplacer.patch),
+generated with `git diff main.nf` on the machine that holds the modified copy: 4 lines
+added, 3 removed, exactly the change the prose described. It applies to
+`github.com/jgolob/maliampi` at tag `v3.5.0`
+(`333d83ba988157fcae07200dcdc861f6b3306938`) — the local directory is named
+`maliampi_pplacer`, but there is no such upstream project.
 
 ## 3. `--cmalign_mxsize 4096` and the `AlignSV` CPU count are unverified
 
-**Status:** open. **Blocks:** nothing today; matters when the run is repeated.
+**Status:** resolved 2026-09-24, and they are set in two different places.
 
-Both values come from the project's working history, not from a log. Confirm against
-`.nextflow/history` (see item 1). Recorded in
-[`docs/TROUBLESHOOTING.md` §4](docs/TROUBLESHOOTING.md) with the same caveat.
+`--cmalign_mxsize 4096` is a command-line flag and is in the final session's invocation
+(item 1). The CPU count is **not** a flag: `AlignSV` carries `label = 'mem_veryhigh'`,
+which the `standard` profile caps at 1 CPU and 9 GB. The config now committed is the
+copy that was in effect for the final session (item 12).
 
 ## 4. `Au122_S43` versus `Au122_S41`
 
@@ -59,20 +54,15 @@ the suffix does not enter any join.
 
 ## 5. Where the `classify/` tables actually live
 
-**Status:** open. **Blocks:** nothing; it is a provenance ambiguity.
+**Status:** resolved 2026-09-24 — there is one copy, and it was moved.
 
-The run's `--output` was `~/datos_microbiota_vaginal/salida_analisis/`, but the tables
-used downstream were taken from a copy under `archivos_extra/salida_analisis/`. Whether
-that is a manual copy, or the output of a second run, has not been established. The
-checksums in
-[`metadata/maliampi_outputs_manifest.csv`](metadata/maliampi_outputs_manifest.csv) were
-computed on the `archivos_extra` copy — which is the copy every number in this repository
-describes. To close:
-
-```bash
-md5sum ~/datos_microbiota_vaginal/salida_analisis/classify/tables/tallies_wide.species.csv
-md5sum ~/archivos_extra/salida_analisis/classify/tables/tallies_wide.species.csv
-```
+The run's `--output` was `~/datos_microbiota_vaginal/salida_analisis/`. **That directory
+no longer exists.** The outputs are only at `~/archivos_extra/salida_analisis/`, and
+their SHA-256 sums match
+[`metadata/maliampi_outputs_manifest.csv`](metadata/maliampi_outputs_manifest.csv) file
+for file (checked on `tallies_wide.genus.csv`, `tallies_wide.species.csv`,
+`dada2.sv.fasta`, `refpkg.tar.gz` and `failed_specimens.csv`). So it was a move after
+the run, not a second run, and nothing downstream consumed a different copy.
 
 ## 6. 111 specimens here, 110 in the analysis matrix
 
@@ -123,11 +113,12 @@ and that map is the only source used.
 
 ## 9. Container tags are only partially recorded
 
-**Status:** open. **Blocks:** full version pinning.
+**Status:** resolved 2026-09-24.
 
-Only `golob/taxtastic:0.9.5D` appears in the surviving log. The tags for DADA2, pplacer,
-barcodecop, TrimGalore and FastQC are pinned by workflow revision `3239c625a8` but have
-not been written down. See [`env/VERSIONS.md`](env/VERSIONS.md).
+All seventeen tags are now listed in [`env/VERSIONS.md`](env/VERSIONS.md), read off the
+workflow source at the pinned commit. Two of them (`trim-galore`, `fastqc`) are declared
+with single quotes in `modules/preprocess.nf`, so a grep written for double quotes
+reports them as absent — which is how they came to be described as missing.
 
 ## 10. `metadata_qiime.csv` must not be used, and the QIIME2 pipeline still points to it
 
@@ -164,12 +155,38 @@ identification that takes it as DNA concentration pairs most specimens with anot
 specimen's concentration. The canonical map's `conc_biblioteca_ng_ul` is the verified
 value per Au.
 
+## 12. The committed `nextflow.config` now comes from the machine that ran
+
+**Status:** resolved 2026-09-24, by replacing the file.
+
+The copy of [`env/nextflow.config`](env/nextflow.config) previously committed came from an
+**earlier snapshot** of the config: it capped `mem_veryhigh` at 6 CPUs and 11.5 GB. The
+machine's `~/.nextflow/config` — last modified 2026-02-17, the day before the final
+session, with no run ever passing `-c` — caps it at **1 CPU and 9 GB**. Three other
+values differ as well, earlier snapshot versus machine: `multithread` CPUs (4 versus 2),
+`io_mem` memory and the profile's default memory (11.5 GB versus 8 GB in both).
+
+The difference matters for reproduction. `mem_veryhigh` is `AlignSV`'s label, and 6 CPUs
+for `cmalign` is the configuration under which it exited with status 137, out of memory
+(item 3). `workflow/run_maliampi.sh` passes this file with `-c`, so it now launches
+`cmalign` with the caps the final session used, the ones reached after four rounds of
+adjustment. The file is the verbatim machine copy, with the change described in its
+header.
+
 ---
 
 ## Resolved
 
-Items 4, 6 and 8 above are resolved and kept in place, so that
-references to them by number stay valid.
+Items 1, 2, 3, 4, 5, 6, 8, 9 and 12 above are resolved and kept in place, so that
+references to them by number stay valid. Items 7, 10 and 11 remain open.
+
+**The WSL machine held the answers to five of them.** On 2026-09-24,
+`\\wsl.localhost\Ubuntu-22.04\home\martinruhle` was inspected: the run directory, its
+rotated Nextflow logs, the patched pipeline clone, the global Nextflow config and the
+output copy. That closed items 1, 2, 3, 5 and 9, established that the workflow is
+pinned by commit `333d83ba…` plus a patch rather than by the `3239c625a8` string the log
+prints (see [`env/VERSIONS.md`](env/VERSIONS.md)), and led to item 12. The evidence is in
+[`logs/`](logs/) and [`workflow/patches/`](workflow/patches/).
 
 **Four specimens re-anchored in the concordance.** In the QIIME2 input of the May run, the
 rows labelled Au52 and Au197 held each other's counts, and so did the rows labelled Au179
@@ -192,4 +209,4 @@ found needs updating, but the manuscript PDF was not searched.
 
 ---
 
-*Last updated 2026-09-21.*
+*Last updated 2026-09-26.*

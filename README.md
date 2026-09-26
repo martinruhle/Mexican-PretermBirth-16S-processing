@@ -67,6 +67,7 @@ median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values 
 | Stage | State |
 |---|---|
 | MaLiAmPi run on the Mexican cohort | ✅ complete (2026-02-18), documented here |
+| Reproduction recipe: command, patch, config, container tags | ✅ recovered and pinned (2026-09-24) — [`docs/RUN_MALIAMPI.md`](docs/RUN_MALIAMPI.md), [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Provenance of the reference package | ✅ established |
 | Specimen ↔ participant linkage | ✅ one canonical map, identified by SHA-256; every MaLiAmPi ↔ QIIME2 pairing verified (2026-09-21) — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §6](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | QIIME2 ↔ MaLiAmPi concordance | ⚠️ re-run and archived, **not yet reproducible from this repository** — see [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
@@ -79,9 +80,12 @@ Nothing in this repository is written as if a pending stage were done. Where a r
 was produced but cannot yet be re-run from here, it says so at the point where the
 result is quoted.
 
-Two gaps are worth knowing before you rely on anything: the exact command of the
-successful run has not been recovered, and the local `main.nf` patch is described but not
-committed. Both are in [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), along with six more open ones.
+The exact command of the final session and the `main.nf` patch were recovered on
+2026-09-24 from the machine that ran the pipeline, together with the Nextflow config that
+was in effect. That config caps `cmalign` at one CPU and 9 GB; it now replaces an earlier
+snapshot committed here, which allowed six CPUs and 11.5 GB
+([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) item 12). Three items remain open, none of which
+affects what is described above: items 7, 10 and 11.
 
 ---
 
@@ -141,4 +145,4 @@ Licensed MIT — see [`LICENSE`](LICENSE).
 
 ---
 
-*Last updated 2026-09-21.*
+*Last updated 2026-09-24.*

@@ -1,0 +1,21 @@
+# MaLiAmPi launch command of the FINAL session, verbatim from the Nextflow debug log.
+# Source: ~/datos_microbiota_vaginal/.nextflow.log, first line, on the WSL machine
+# (Ubuntu-22.04, host MartinZenbook), recovered 2026-09-24.
+# Session `serene_gautier`, started Feb-18 11:54:13, "Execution complete -- Goodbye"
+# at Feb-18 12:00:03. It ran with -resume, so it published the outputs this
+# repository describes while most processes reported as cached.
+# The only edit is the address passed to --email, replaced by <redacted>.
+#
+# Note: ~/.nextflow/history is empty on that machine, which is why this was not
+# recovered earlier. The rotated .nextflow.log* files are what hold the record.
+
+Feb-18 11:54:13.800 [main] DEBUG nextflow.cli.Launcher - $> nextflow run /home/martinruhle/.nextflow/assets/jgolob/maliampi_pplacer -profile standard -resume -w /home/martinruhle/datos_microbiota_vaginal/working_dir/ --manifest /home/martinruhle/datos_microbiota_vaginal/Manifiesto.csv --output /home/martinruhle/datos_microbiota_vaginal/salida_analisis/ --email <redacted> --repo_fasta /home/martinruhle/arf_20200420/dedup/1200bp/named/filtered/seqs.fasta --repo_si /home/martinruhle/arf_20200420/dedup/1200bp/named/filtered/seq_info.csv --taxdmp /home/martinruhle/arf_20200420/taxdmp.zip --cmalign_mxsize 4096
+
+# The difference against the Nov-06 session recorded in maliampi_launch_command.txt is
+# the last flag: --cmalign_mxsize 4096. The reduced CPU count for AlignSV is NOT a flag;
+# it comes from the process label (see env/nextflow.config and docs/TROUBLESHOOTING.md §4).
+#
+# `/home/martinruhle/.nextflow/assets/jgolob/maliampi_pplacer` is a local clone of
+# https://github.com/jgolob/maliampi.git at tag v3.5.0
+# (commit 333d83ba988157fcae07200dcdc861f6b3306938), with main.nf locally modified:
+# workflow/patches/main.nf.pplacer.patch.
