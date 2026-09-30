@@ -1,7 +1,7 @@
 # Nextflow runtime header, verbatim from the debug log.
 # Nextflow does not stamp the year on its log timestamps; this log was
 # captured on 2026-02-13, so 'Nov-06' corresponds to 2025-11-06.
-# The workflow revision (3239c625a8) is the value that pins the pipeline code.
+# 'revision: 3239c625a8' is Nextflow's script id, not a commit; see env/VERSIONS.md.
 
 Nov-06 14:49:04.428 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.8
 Nov-06 14:49:05.111 [main] DEBUG nextflow.cli.CmdRun - Launching `/home/martinruhle/.nextflow/assets/jgolob/maliampi_pplacer/main.nf` [jovial_mercator] DSL2 - revision: 3239c625a8

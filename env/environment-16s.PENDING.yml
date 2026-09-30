@@ -7,8 +7,8 @@
 #
 # This is the skeleton for the downstream 16S tooling: the steps that run AFTER
 # MaLiAmPi and are not covered by the workflow's own containers. The MaLiAmPi
-# tool chain itself is pinned by the workflow revision (3239c625a8) and does not
-# belong here — see VERSIONS.md.
+# tool chain itself is pinned by the workflow commit (333d83ba9881) plus a local
+# patch, and does not belong here — see VERSIONS.md.
 #
 # To complete it, on the machine that actually runs these tools:
 #   conda list --explicit           # exact builds, or

@@ -13,9 +13,10 @@
 #      version and SHA-256 recorded in docs/NEXT_STAGE_DREAM_REFPKG.md.
 #
 #   2. The parameter name for supplying a PRE-BUILT reference package has to be
-#      read off the workflow source at revision 3239c625a8. Our own run never
-#      used it — it passed --repo_fasta / --repo_si / --taxdmp and let the
-#      pipeline build one — so the name is not in any log we hold. Check with:
+#      read off the workflow source at the pinned commit, 333d83ba9881, with
+#      workflow/patches/main.nf.pplacer.patch applied. Our own run never used
+#      it — it passed --repo_fasta / --repo_si / --taxdmp and let the pipeline
+#      build one — so the name is not in any log we hold. Check with:
 #         grep -rn "refpkg" ~/.nextflow/assets/jgolob/maliampi_pplacer/*.nf
 #      Writing a guess here would be worse than leaving it blank.
 #
@@ -25,8 +26,9 @@
 #      the comparison with the run already documented.
 #
 # Once those are known, this script should mirror workflow/run_maliampi.sh: same
-# pinned revision, same config, a separate --output directory, and the same two
-# recording commands at the end (make_output_manifest.sh + describe_refpkg.R).
+# pinned commit and patch, same config, a separate --output directory, and the
+# same two recording commands at the end (make_output_manifest.sh +
+# describe_refpkg.R).
 # ---------------------------------------------------------------------------
 set -euo pipefail
 

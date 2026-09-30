@@ -14,9 +14,9 @@ The reference package the run built is documented separately, in
 ## 1. In one paragraph
 
 111 vaginal 16S amplicon libraries (V3–V4, paired-end, Illumina MiSeq) from the Mexican
-preterm birth cohort were processed with **MaLiAmPi**, in the `maliampi_pplacer` variant
-at workflow revision `3239c625a8`, under **Nextflow 25.04.8** on a laptop running Ubuntu
-under WSL2, with Docker containers and 6 CPUs / 11.5 GB of RAM. The pipeline denoised
+preterm birth cohort were processed with **MaLiAmPi**, pinned by commit `333d83ba9881`
+plus a local patch (§4), under **Nextflow 25.04.8** on a laptop running Ubuntu under
+WSL2, with Docker containers and 6 CPUs / 11.5 GB of RAM. The pipeline denoised
 the reads with DADA2, built a 16S reference package from the ARF reference sequence
 repository, placed every sequence variant on that reference phylogeny with pplacer, and
 classified the placements into taxonomic tables. The run was carried out in many resumed
