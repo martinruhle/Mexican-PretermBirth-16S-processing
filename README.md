@@ -71,7 +71,7 @@ median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values 
 | Reproduction recipe: command, patch, config, container tags | ✅ recovered and pinned (2026-09-24) — [`docs/RUN_MALIAMPI.md`](docs/RUN_MALIAMPI.md), [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Provenance of the reference package | ✅ established |
 | Specimen ↔ participant linkage | ✅ one canonical map, identified by SHA-256; every MaLiAmPi ↔ QIIME2 pairing verified (2026-09-21) — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §6](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
-| QIIME2 ↔ MaLiAmPi concordance | ⚠️ re-run and archived, **not yet reproducible from this repository** — see [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
+| QIIME2 ↔ MaLiAmPi concordance | ✅ reproducible from this repository (2026-10-01): [`analysis/concordance_qiime2_maliampi.Rmd`](analysis/concordance_qiime2_maliampi.Rmd) returns the archived numbers and tables from three hash-checked inputs — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | Software environment for the downstream tooling | ⚠️ partially pinned — [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Phylotype binning (0.1 / 0.5 / 1.0) | 🚧 not started |
 | **Extending the cohort with the earlier sequencing run** | 🚧 planned, and it needs a different route — [`docs/NEXT_STAGE_OLD_RUN.md`](docs/NEXT_STAGE_OLD_RUN.md) |
@@ -121,6 +121,16 @@ git diff metadata/maliampi_outputs_manifest.csv
 
 An empty diff means the outputs are identical to the ones every document here describes.
 
+The QIIME2 ↔ MaLiAmPi comparison, by contrast, re-runs in seconds from three input files:
+one MaLiAmPi table, the raw QIIME2 export and the specimen map. It checks each file's
+SHA-256 before reading it, and it stops if any archived number or table comes out
+different
+([`analysis/README.md`](analysis/README.md) says where to put the inputs):
+
+```bash
+Rscript -e "rmarkdown::render('analysis/concordance_qiime2_maliampi.Rmd')"
+```
+
 ## What is deliberately absent
 
 No FASTQ files, no classification database, no taxon × specimen abundance table for any
@@ -147,4 +157,4 @@ Licensed MIT — see [`LICENSE`](LICENSE).
 
 ---
 
-*Last updated 2026-09-26.*
+*Last updated 2026-10-01.*

@@ -79,7 +79,7 @@ today, which means the next stage is currently not reproducible on another machi
 | VALENCIA | community state type assignment from species tables | **pending** |
 | MaLiAmPi phylotype binning | phylotypes at 0.1 / 0.5 / 1.0 | **pending** |
 | Python (for the VALENCIA conversion scripts) | | **pending** |
-| R + packages for the concordance report | R 4.4.2; tidyverse 2.0.0, vegan 2.7.2, patchwork 1.3.2, ggrepel 0.9.6 | ✅ captured — [`results/concordance/as_run_2026-09-21/run_curation_on.log`](../results/concordance/as_run_2026-09-21/run_curation_on.log). Still needs pinning in the environment file, not just recording |
+| R + packages for the concordance report | R 4.4.2; tidyverse 2.0.0, vegan 2.7.2, patchwork 1.3.2, ggrepel 0.9.6; for the reproducible report also readxl 1.4.5, here 1.0.2, digest 0.6.37, rmarkdown 2.30, knitr 1.51 | ✅ captured — [`results/concordance/as_run_2026-09-21/run_curation_on.log`](../results/concordance/as_run_2026-09-21/run_curation_on.log), and the full `sessionInfo()` at the end of [`analysis/concordance_qiime2_maliampi.html`](../analysis/concordance_qiime2_maliampi.html). Still needs pinning in the environment file, not just recording |
 
 The product that closes this gap is a conda environment file with exact pins, not
 ranges: [`environment-16s.PENDING.yml`](environment-16s.PENDING.yml). It is deliberately

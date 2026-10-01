@@ -1,15 +1,16 @@
 # Do QIIME2 and MaLiAmPi describe the same microbiome?
 
 **Status: re-run on 2026-09-21 with every specimen anchored to its own QIIME2 profile
-through the canonical specimen map; not yet reproducible from this repository.**
+through the canonical specimen map; reproducible from this repository since 2026-10-01.**
 The comparison was first run on 2026-05-22 and presented at the fourth doctoral tutorial.
 That run paired specimens by the label column of its QIIME2 table. In the 2026-09-21
 re-run, **four specimens (Au52, Au197, Au179, Au203) are re-anchored to their own QIIME2
 profile** through the canonical specimen map; the other 106 carry the same counts in both
 runs ([§4](#4-four-specimens-re-anchored-to-their-own-qiime2-profile)). The verdict holds
-and every paired statistic rises. Both runs are archived. What is still missing is a
-self-contained report with relative paths, a fixed seed and a recorded session. See
-[§7](#7-what-is-still-missing).
+and every paired statistic rises. Both runs are archived. A self-contained report,
+[`analysis/concordance_qiime2_maliampi.Rmd`](../analysis/concordance_qiime2_maliampi.Rmd),
+recomputes the 2026-09-21 run from three hash-checked inputs and returns the same numbers
+and the same tables, byte for byte. See [§7](#7-reproducing-it).
 
 ---
 
@@ -178,6 +179,7 @@ re-anchored rows.
 | Environment | R 4.4.2, tidyverse 2.0.0, vegan 2.7.2, patchwork 1.3.2, ggrepel 0.9.6 — recorded in [`run_curation_on.log`](../results/concordance/as_run_2026-09-21/run_curation_on.log) |
 | Date | 2026-09-21. Curation on and curation off, selected with `GATE_CURACION_EXTENDIDA` |
 | Outputs | [`results/concordance/as_run_2026-09-21/`](../results/concordance/as_run_2026-09-21/): two reports, per-track tables, four figures per track, the run log and the pairing verification log |
+| Reproducible version | [`analysis/concordance_qiime2_maliampi.Rmd`](../analysis/concordance_qiime2_maliampi.Rmd), 2026-10-01: same numbers and tables from three hash-checked inputs (§7) |
 | Superseded | [`gate_qiime2_maliampi_v2.R`](../analysis/as_run/gate_qiime2_maliampi_v2.R) → [`as_run_2026-05-22/`](../results/concordance/as_run_2026-05-22/) (pairing by label, before the four specimens were re-anchored; kept as history), and `gate_qiime2_maliampi_v1.R` before it |
 
 ## 6. Sample linkage: the canonical map
@@ -203,30 +205,74 @@ below the 1,000-count filter).
   `genus_rel_filtered_conc_2026-03-06_abs.csv` (§4), and not from its `[BIB](ng/ul)1`
   column (item 11).
 
-## 7. What is still missing
+## 7. Reproducing it
 
-The analysis exists; the *reproducible* analysis does not. To close it:
+[`analysis/concordance_qiime2_maliampi.Rmd`](../analysis/concordance_qiime2_maliampi.Rmd),
+rendered to
+[`analysis/concordance_qiime2_maliampi.html`](../analysis/concordance_qiime2_maliampi.html),
+is the reproducible version of the v3 script. It has no absolute paths and no `setwd()`:
+it finds the project root from its own location. It sets the seed (42) before each
+Mantel test, as v3 does, and ends with `sessionInfo()`. From the repository root:
 
-1. **Port the script to a self-contained report** (`analysis/concordance_qiime2_maliampi.Rmd`)
-   with no absolute paths and no `setwd()`, inputs resolved relative to the project
-   root, a fixed seed, and `sessionInfo()` printed at the end. It should read the QIIME2
-   counts from the raw export and the linkage from the canonical map, as v3 does.
-2. **Render it** to `analysis/concordance_qiime2_maliampi.html` and commit both.
-3. **Reproduce the archived numbers.** The target is now
-   `results/concordance/as_run_2026-09-21/`. The ported version must return the same 65
-   shared genera, the same median ρ = 0.585, the same Mantel 0.958 and Procrustes 0.925.
-   A difference is an investigation, not noise.
-4. **The QIIME2 input chain, as far as the gate is concerned, is settled.** Once
-   re-anchored, the gate's QIIME2 counts are exactly the raw QIIME2 export's counts for
-   all 110 specimens: no decontam or filtering touched them. What remains undocumented is
-   how the manuscript's matrices were derived from that export
-   ([`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 7). That belongs to the analysis
-   compendium.
-5. **Settle the name curation.** The script carries a flag
-   (`CURACION_EXTENDIDA`) that merges *Mycoplasma* with *Mesomycoplasma*, *Prevotella*
-   with *Hoylesella* and *Segatella*, and *Atopobium* into *Fannyhessea*, and strips
-   NCBI suffixes such as `<high GC Gram+>`. Both settings were reported; the ported
-   version must state which one it uses and why.
+```bash
+Rscript -e "rmarkdown::render('analysis/concordance_qiime2_maliampi.Rmd')"
+```
+
+### Inputs
+
+There are three, and none of them is in the repository. Each is checked against its
+recorded SHA-256 before it is read, and a mismatch stops the render. By default they are
+looked for under the git-ignored `data/` and `metadata/` directories. The parameters
+`maliampi_out`, `qiime2_dir` and `specimen_map` point elsewhere.
+
+| Input | Default location | SHA-256 recorded in |
+|---|---|---|
+| `classify/tables/tallies_wide.genus.csv` | `data/maliampi/` | the output manifest |
+| `level-6_vag138.xlsx`, the raw QIIME2 export | `data/qiime2/` | §5 above |
+| `mapa_muestras_2026-09-20.csv` | `metadata/` | the output manifest |
+
+`genus_rel_filtered_conc_2026-03-06_abs.csv` is no longer an input. v3 read only its
+taxon names and row labels from it. The report takes the specimens from the canonical
+map, and it derives the names from the SILVA lineages of the raw export: the last rank
+that is neither empty nor `Incertae_Sedis`, bare for a genus and with its prefix
+otherwise, plus `.1` for a repeated name. That rule yields the same 97 names, in the
+same order.
+
+### What it reproduces
+
+Rendered on 2026-10-01 against the inputs above:
+
+- **Target numbers.** In the genus track with curation on: 65 shared genera, median
+  ρ 0.585, 15 genera above 0.7, Mantel 0.958, Procrustes 0.925. All five are equal.
+- **Archived reports.** Every line of both tracks of `report_curation_on.md` and
+  `report_curation_off.md`, regenerated with v3's own report function, is identical.
+- **Archived tables.** The nine CSV tables are identical byte for byte. The four lists
+  of unmatched taxa hold the same lines. Three of them are in a different order, because
+  the report sorts them in C-locale order so that they do not depend on the session's
+  locale.
+- **Figures.** All eight are identical byte for byte.
+
+Each of these comparisons runs inside the report, and a difference stops the render.
+Outputs are written to
+[`results/concordance/reproducible/`](../results/concordance/reproducible/), with the
+same layout as the archived directory.
+
+### Name curation
+
+The report uses curation on, and states why. The SILVA release behind QIIME2 splits
+*Mycoplasma* (*Mesomycoplasma*) and *Prevotella* (*Hoylesella*, *Segatella*); the NCBI
+taxonomy behind MaLiAmPi does not. MaLiAmPi also has *Atopobium* where SILVA has
+*Fannyhessea*. Without curation, the same organisms are compared under different names,
+or not compared at all. Curation off is computed alongside, for contrast, and checked
+against its own archived report.
+
+### Still open
+
+As far as this comparison is concerned, the QIIME2 input chain is settled: the counts
+are the raw QIIME2 export's, read through the canonical map, and no decontam or
+filtering touched them. What remains undocumented is how the manuscript's matrices were
+derived from that export ([`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 7). That belongs
+to the analysis compendium.
 
 No abundance table for any participant belongs in this repository at any point in the
 above; see [`DATA_ACCESS.md`](DATA_ACCESS.md).
@@ -236,6 +282,7 @@ above; see [`DATA_ACCESS.md`](DATA_ACCESS.md).
 | | |
 |---|---|
 | Written | 2026-08-30 |
+| Reproducible report | 2026-10-01 |
 | Pairing verified, re-run | 2026-09-21 |
 | First run | 2026-05-22 |
 | Reviewed by | *pending* |
