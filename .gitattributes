@@ -1,0 +1,7 @@
+# analysis/concordance_qiime2_maliampi.Rmd compares the tables it writes with
+# the archived ones byte for byte. R writes them with LF line endings: check
+# them out the same way on every platform, whatever core.autocrlf says.
+results/**/*.csv text eol=lf
+results/**/*.txt text eol=lf
+results/**/*.md  text eol=lf
+results/**/*.log text eol=lf
