@@ -1,0 +1,761 @@
+---
+title: "QIIME2 ↔ MaLiAmPi concordance"
+subtitle: "Genus-level tables of the Mexican preterm birth cohort, 110 specimens"
+date: "Rendered `r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    self_contained: true
+params:
+  maliampi_out: "data/maliampi"
+  qiime2_dir: "data/qiime2"
+  specimen_map: "metadata/mapa_muestras_2026-09-20.csv"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, comment = "")
+```
+
+**What this is.** The reproducible version of the comparison between the QIIME2/DADA2
+and MaLiAmPi genus tables, ported from
+[`analysis/as_run/gate_qiime2_maliampi_v3.R`](as_run/gate_qiime2_maliampi_v3.R). It has
+no absolute paths and no `setwd()`, fixes its random seed, checks the SHA-256 of every
+input before reading it, and ends with `sessionInfo()`. Question, design and verdict are
+in [`docs/CONCORDANCE_QIIME2_MALIAMPI.md`](../docs/CONCORDANCE_QIIME2_MALIAMPI.md).
+
+**What it has to reproduce.** The outputs archived in
+[`results/concordance/as_run_2026-09-21/`](../results/concordance/as_run_2026-09-21/).
+The [reproduction check](#reproduction-check) at the end compares them number by number
+and file by file, and stops the render at the first difference.
+
+**How to run it.** From the repository root:
+
+```
+Rscript -e "rmarkdown::render('analysis/concordance_qiime2_maliampi.Rmd')"
+```
+
+The three inputs are not in this repository (they are participant-level). By default
+they are looked for under the git-ignored `data/` and `metadata/` directories; if they
+live elsewhere, pass their location as parameters, e.g.
+`params = list(maliampi_out = "<MaLiAmPi output dir>", qiime2_dir = "<dir with level-6_vag138.xlsx>")`.
+Location does not matter: identity is established by hash. Tables and figures are
+written to [`results/concordance/reproducible/`](../results/concordance/reproducible/).
+
+# Setup
+
+```{r packages}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(readxl)
+  library(vegan)
+  library(patchwork)
+  library(ggrepel)
+  library(scales)
+})
+
+# The project root is wherever this file sits under analysis/; no setwd().
+suppressMessages(here::i_am("analysis/concordance_qiime2_maliampi.Rmd"))
+
+SEED    <- 42   # set before each Mantel test; protest() continues the same stream
+OUT_DIR <- here::here("results", "concordance", "reproducible")
+AS_RUN  <- here::here("results", "concordance", "as_run_2026-09-21")
+```
+
+# Inputs
+
+Expected hashes come from
+[`metadata/maliampi_outputs_manifest.csv`](../metadata/maliampi_outputs_manifest.csv)
+for the MaLiAmPi table and the specimen map, and from
+[`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §5](../docs/CONCORDANCE_QIIME2_MALIAMPI.md) for the
+raw QIIME2 export. A mismatch stops the render.
+
+```{r inputs}
+# A relative parameter is resolved against the project root; an absolute one is used as is.
+resolve <- function(p) if (grepl("^(/|~|[A-Za-z]:[/\\\\])", p)) p else here::here(p)
+sha256  <- function(p) digest::digest(p, algo = "sha256", file = TRUE)
+
+manifest <- read_csv(here::here("metadata", "maliampi_outputs_manifest.csv"),
+                     show_col_types = FALSE)
+from_manifest <- function(rel) manifest$sha256[manifest$relative_path == rel]
+
+inputs <- tibble(
+  input    = c("MaLiAmPi genus tallies", "QIIME2 level-6 export", "Canonical specimen map"),
+  file     = c("classify/tables/tallies_wide.genus.csv", "level-6_vag138.xlsx",
+               "mapa_muestras_2026-09-20.csv"),
+  path     = c(file.path(resolve(params$maliampi_out), "classify", "tables",
+                         "tallies_wide.genus.csv"),
+               file.path(resolve(params$qiime2_dir), "level-6_vag138.xlsx"),
+               resolve(params$specimen_map)),
+  expected = c(from_manifest("classify/tables/tallies_wide.genus.csv"),
+               "2fe59049cc79c44cccf11b92e4eaae31990fa1431a84e6e4ab270d11d8ffbafe",
+               from_manifest("metadata/mapa_muestras_2026-09-20.csv"))
+)
+stopifnot(all(nchar(inputs$expected) == 64))
+if (!all(file.exists(inputs$path)))
+  stop("Input not found: ", paste(inputs$file[!file.exists(inputs$path)], collapse = ", "),
+       ". Set params maliampi_out, qiime2_dir or specimen_map to where it is.", call. = FALSE)
+inputs$observed <- map_chr(inputs$path, sha256)
+
+knitr::kable(transmute(inputs, input, file, sha256 = observed,
+                       `matches record` = observed == expected))
+stopifnot(identical(inputs$observed, inputs$expected))
+
+PATH_MALIAMPI <- inputs$path[1]
+PATH_QIIME2   <- inputs$path[2]
+PATH_MAP      <- inputs$path[3]
+```
+
+# Preparing the two tables
+
+## MaLiAmPi
+
+`tallies_wide.genus.csv` has one row per taxon (any rank) and one column per specimen,
+named `Au###_S##`. The suffix is the sample-sheet position and is stripped to join.
+Composite names (`X/Y`) are excluded, as in v3.
+
+```{r maliampi}
+mal_raw <- read_csv(PATH_MALIAMPI, show_col_types = FALSE)
+stopifnot(identical(dim(mal_raw), c(547L, 114L)))
+
+# NCBI disambiguation suffixes, e.g. "Gordonia <high GC Gram+>" -> "Gordonia".
+limpieza_ncbi <- function(x) str_trim(str_replace_all(x, "\\s*<[^>]*>", ""))
+
+# solo_genero = TRUE keeps rank == "genus" (track genus); FALSE keeps every rank
+# (track all_taxa). A name present at more than one rank is summed per specimen.
+prep_mal_long <- function(mal_raw, solo_genero) {
+  m <- mal_raw
+  if (solo_genero) m <- m |> filter(rank == "genus")
+  m <- m |> select(-any_of(c("tax_id", "rank")))
+  m <- m[!str_detect(m$tax_name, "/"), , drop = FALSE]
+  m |>
+    pivot_longer(-tax_name, names_to = "sample_full", values_to = "count") |>
+    mutate(count = replace_na(count, 0),
+           sample_id = str_remove(sample_full, "_S\\d+$")) |>
+    group_by(tax_name, sample_id) |>
+    summarise(count = sum(count), .groups = "drop")
+}
+
+mal_specimens <- str_remove(setdiff(names(mal_raw), c("tax_name", "tax_id", "rank")),
+                            "_S\\d+$")
+stopifnot(length(mal_specimens) == 111, !anyDuplicated(mal_specimens))
+table(rank = mal_raw$rank)
+```
+
+## QIIME2
+
+The counts are the raw QIIME2 level-6 export, one row per specimen named by its `Au###`,
+read through the canonical specimen map: every specimen gets its own counts, and nothing
+is taken from an intermediate table. Which specimens enter is decided by the map's
+`en_analisis` column, and each specimen's total has to equal the map's `conteos_qiime`.
+Only the `Au`, `en_analisis` and `conteos_qiime` columns of the map are read. v3 reached
+the same counts from an intermediate table, replacing its counts with these (its block
+4a); in four rows of that table they belonged to another specimen
+([`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §4](../docs/CONCORDANCE_QIIME2_MALIAMPI.md)).
+
+Each QIIME2 column is a full SILVA lineage. Its short name is the last rank that is
+neither empty nor `Incertae_Sedis`: a genus is written bare, any other rank keeps its
+prefix (`f__`, `o__`, …), and a repeated name gets `.1`. The result is, in name and
+order, the 97 column names of that intermediate table, from which v3 took its names
+(checked on 2026-10-01). The port therefore does not read it at all.
+
+```{r qiime2}
+q2_raw   <- read_excel(PATH_QIIME2, .name_repair = "minimal")
+lineages <- names(q2_raw)[str_detect(names(q2_raw), "__")]
+
+short_name <- function(lineage) {
+  r <- str_split_1(lineage, ";")
+  r <- r[!str_detect(r, "^[a-z]?__(Incertae_Sedis)?$")]
+  last <- r[length(r)]
+  if (str_starts(last, "g__")) str_remove(last, "^g__") else last
+}
+taxa_cols <- make.unique(map_chr(lineages, short_name), sep = ".")
+
+specimen_map <- read_csv(PATH_MAP, show_col_types = FALSE,
+                         col_select = c(Au, en_analisis, conteos_qiime))
+in_analysis <- specimen_map$Au[specimen_map$en_analisis == "si"]
+
+stopifnot(length(lineages) == 97, !anyDuplicated(taxa_cols),
+          nrow(specimen_map) == 111, !anyDuplicated(specimen_map$Au),
+          setequal(specimen_map$Au, q2_raw$index),
+          setequal(specimen_map$Au, mal_specimens),
+          length(in_analysis) == 110)
+
+CNT <- as.matrix(q2_raw[match(in_analysis, q2_raw$index), lineages])
+storage.mode(CNT) <- "numeric"
+dimnames(CNT) <- list(in_analysis, taxa_cols)
+stopifnot(!anyNA(CNT),
+          rowSums(CNT) == specimen_map$conteos_qiime[match(in_analysis, specimen_map$Au)])
+
+specimen_map |>
+  filter(en_analisis != "si") |>
+  transmute(`excluded specimen` = Au, `QIIME2 counts` = conteos_qiime)
+tibble(`QIIME2 columns` = length(taxa_cols),
+       `resolved to genus` = sum(!str_detect(taxa_cols, "^[focdkpr]__")),
+       `higher rank only` = sum(str_detect(taxa_cols, "^[focdkpr]__")))
+```
+
+The excluded specimen falls below the 1,000-count filter. It is still a MaLiAmPi column,
+so it simply has no QIIME2 partner: 110 specimens are compared.
+
+## Name curation
+
+The two pipelines name some of the same organisms differently. The curation used here
+does three things before matching:
+
+- strips NCBI disambiguation suffixes from MaLiAmPi names (`<high GC Gram+>` and the like);
+- within QIIME2, sums *Mesomycoplasma* into *Mycoplasma*, and *Hoylesella* and
+  *Segatella* into *Prevotella*: the SILVA release behind QIIME2 splits those genera, the
+  NCBI taxonomy behind MaLiAmPi does not;
+- on the MaLiAmPi side, counts *Atopobium* as *Fannyhessea* (MaLiAmPi has no
+  *Fannyhessea*), and *Escherichia* plus *Shigella* as *Escherichia-Shigella*, as SILVA
+  does.
+
+**This report uses curation on.** Without it, the same organisms are compared under
+different names, or not compared at all: QIIME2's *Prevotella* would be set against only
+part of MaLiAmPi's. Curation on is also the variant from which the verdict in
+`docs/CONCORDANCE_QIIME2_MALIAMPI.md` is stated. Curation off is computed as well
+([below](#curation-off-for-contrast)), and both variants are checked against their
+archived reports.
+
+```{r prepare}
+# Builds the long tables of both tracks for one curation setting.
+prepare <- function(curacion) {
+  mr <- mal_raw
+  if (curacion) mr <- mr |> mutate(tax_name = limpieza_ncbi(tax_name))
+
+  q2_long_all <- as_tibble(CNT, rownames = "sample_id") |>
+    pivot_longer(-sample_id, names_to = "tax_name", values_to = "count") |>
+    mutate(count = replace_na(count, 0))
+  if (curacion) {
+    q2_silva_merge <- list("Mycoplasma" = c("Mycoplasma", "Mesomycoplasma"),
+                           "Prevotella" = c("Prevotella", "Hoylesella", "Segatella"))
+    for (canon in names(q2_silva_merge)) {
+      syns <- q2_silva_merge[[canon]]
+      if (length(intersect(syns, unique(q2_long_all$tax_name))) > 1)
+        q2_long_all <- q2_long_all |>
+          mutate(tax_name = if_else(tax_name %in% syns, canon, tax_name))
+    }
+  }
+  # One row per (specimen, taxon), whatever the setting.
+  q2_long_all <- q2_long_all |>
+    group_by(sample_id, tax_name) |>
+    summarise(count = sum(count), .groups = "drop")
+
+  curated_template <- list("Escherichia-Shigella" = c("Escherichia", "Shigella"))
+  if (curacion) curated_template[["Fannyhessea"]] <- c("Fannyhessea", "Atopobium")
+
+  list(curacion         = curacion,
+       n_ncbi_cleaned   = if (curacion) sum(str_detect(mal_raw$tax_name, "<[^>]*>")) else 0L,
+       mal_long_genus   = prep_mal_long(mr, solo_genero = TRUE),
+       mal_long_all     = prep_mal_long(mr, solo_genero = FALSE),
+       q2_long_genus    = q2_long_all |> filter(!str_detect(tax_name, "^[focdkpr]__")),
+       q2_long_all      = q2_long_all,
+       curated_template = curated_template)
+}
+
+prep_on  <- prepare(TRUE)
+prep_off <- prepare(FALSE)
+```
+
+# The comparison
+
+`run_track()` is v3's function of the same name with its console output removed and an
+optional output directory: with `dir_out = NULL` it computes without writing. Statistics,
+their order and the seed are unchanged. In short, for each track:
+
+- **taxon matching**: direct name matches plus the curated map;
+- **coverage**: the share of each specimen's mass that falls in the shared taxa, with
+  each pipeline's whole table as denominator (asymmetric) and with the denominator
+  restricted to the rank of the match (symmetric);
+- **per taxon**: Spearman ρ across specimens of the relative abundance over each
+  pipeline's whole mass, for taxa present in at least 3 specimens in both;
+- **per specimen**: Jaccard of the top-5 and top-10 taxa, and paired Bray–Curtis, on
+  profiles renormalized to the shared taxa;
+- **between specimens**: Mantel (Spearman, 999 permutations) between the two Bray–Curtis
+  matrices, and Procrustes on their 5-axis PCoA (`protest`, 999 permutations).
+
+```{r run-track}
+# Keeps the curated entries whose components exist in MaLiAmPi.
+build_curated_map <- function(curated_template, mal_taxa) {
+  cm <- list()
+  for (q_name in names(curated_template)) {
+    present <- curated_template[[q_name]][curated_template[[q_name]] %in% mal_taxa]
+    if (length(present) > 0) cm[[q_name]] <- present
+  }
+  cm
+}
+
+# long -> wide (specimens x taxa), absolute counts, aligned by name.
+to_wide_counts <- function(df, samples, taxa) {
+  m <- df |>
+    filter(sample_id %in% samples, tax_name %in% taxa) |>
+    pivot_wider(names_from = tax_name, values_from = count, values_fill = 0) |>
+    arrange(sample_id)
+  rn <- m$sample_id
+  m <- as.matrix(m[, setdiff(colnames(m), "sample_id"), drop = FALSE])
+  rownames(m) <- rn
+  m[, taxa[taxa %in% colnames(m)], drop = FALSE]
+}
+
+# Jaccard of the top-k taxa of two named vectors. sort() is stable, so ties keep
+# column order, which is why the taxon names have to match v3 exactly.
+topk_jaccard <- function(v1, v2, k) {
+  t1 <- names(sort(v1, decreasing = TRUE))[1:min(k, length(v1))]
+  t2 <- names(sort(v2, decreasing = TRUE))[1:min(k, length(v2))]
+  length(intersect(t1, t2)) / length(union(t1, t2))
+}
+
+run_track <- function(mal_long, q2_long, curated_template, etiqueta, dir_out = NULL) {
+  escribir <- !is.null(dir_out)
+  if (escribir) {
+    dir_tablas  <- file.path(dir_out, "tables",  etiqueta)
+    dir_figuras <- file.path(dir_out, "figures", etiqueta)
+    dir.create(dir_tablas,  recursive = TRUE, showWarnings = FALSE)
+    dir.create(dir_figuras, recursive = TRUE, showWarnings = FALSE)
+  }
+
+  # ---- Taxon matching ---------------------------------------------------------
+  mal_taxa <- unique(mal_long$tax_name)
+  q2_taxa  <- unique(q2_long$tax_name)
+  curated_map  <- build_curated_map(curated_template, mal_taxa)
+  direct_match <- setdiff(intersect(q2_taxa, mal_taxa), names(curated_map))
+  q2_in_map    <- union(direct_match, names(curated_map))
+  q2_unmapped  <- setdiff(q2_taxa, q2_in_map)
+  mal_unmapped <- setdiff(mal_taxa, unlist(c(direct_match, curated_map)))
+  if (escribir) {
+    # Radix sort = C-locale order, so these lists do not depend on the session locale.
+    write_lines(sort(q2_unmapped,  method = "radix"),
+                file.path(dir_tablas, "qiime2_taxa_sin_match.txt"))
+    write_lines(sort(mal_unmapped, method = "radix"),
+                file.path(dir_tablas, "maliampi_taxa_sin_match.txt"))
+  }
+
+  # ---- Paired matrices --------------------------------------------------------
+  mal_long_unified <- mal_long |>
+    filter(tax_name %in% c(direct_match, unlist(curated_map))) |>
+    mutate(tax_unified = tax_name)
+  for (q_name in names(curated_map)) {
+    mal_long_unified <- mal_long_unified |>
+      mutate(tax_unified = if_else(tax_name %in% curated_map[[q_name]], q_name, tax_unified))
+  }
+  mal_agg <- mal_long_unified |>
+    group_by(sample_id, tax_unified) |>
+    summarise(count = sum(count), .groups = "drop") |>
+    rename(tax_name = tax_unified)
+  q2_agg <- q2_long |> filter(tax_name %in% q2_in_map)
+
+  shared_samples <- sort(intersect(unique(mal_agg$sample_id), unique(q2_agg$sample_id)))
+  mat_mal_abs <- to_wide_counts(mal_agg, shared_samples, q2_in_map)
+  mat_q2_abs  <- to_wide_counts(q2_agg,  shared_samples, q2_in_map)
+  common_taxa <- intersect(colnames(mat_mal_abs), colnames(mat_q2_abs))
+  mat_mal_abs <- mat_mal_abs[shared_samples, common_taxa, drop = FALSE]
+  mat_q2_abs  <- mat_q2_abs[shared_samples, common_taxa, drop = FALSE]
+  stopifnot(all(rownames(mat_mal_abs) == rownames(mat_q2_abs)),
+            all(colnames(mat_mal_abs) == colnames(mat_q2_abs)))
+
+  # ---- Coverage of the intersection (asymmetric and symmetric) ----------------
+  total_por_muestra <- function(df) df |>
+    filter(sample_id %in% shared_samples) |>
+    group_by(sample_id) |>
+    summarise(total = sum(count), .groups = "drop")
+  mal_total_asym <- total_por_muestra(mal_long)
+  q2_total_asym  <- total_por_muestra(q2_long)
+  q2_long_sym <- if (etiqueta == "genus") {
+    q2_long |> filter(!str_detect(tax_name, "^[focdkpr]__"))
+  } else q2_long
+  mal_total_sym <- total_por_muestra(mal_long)
+  q2_total_sym  <- total_por_muestra(q2_long_sym)
+
+  shared_mal <- rowSums(mat_mal_abs)
+  shared_q2  <- rowSums(mat_q2_abs)
+  idx <- function(tbl, ids) tbl$total[match(ids, tbl$sample_id)]
+  coverage_df <- tibble(
+    sample_id      = shared_samples,
+    shared_mal     = shared_mal[shared_samples],
+    shared_q2      = shared_q2[shared_samples],
+    total_mal_asym = idx(mal_total_asym, shared_samples),
+    total_q2_asym  = idx(q2_total_asym,  shared_samples),
+    total_mal_sym  = idx(mal_total_sym,  shared_samples),
+    total_q2_sym   = idx(q2_total_sym,   shared_samples)
+  ) |>
+    mutate(pct_mal_asym = shared_mal / total_mal_asym,
+           pct_q2_asym  = shared_q2  / total_q2_asym,
+           pct_mal_sym  = shared_mal / total_mal_sym,
+           pct_q2_sym   = shared_q2  / total_q2_sym)
+  stopifnot(!anyNA(coverage_df$pct_mal_asym), !anyNA(coverage_df$pct_q2_asym),
+            all(coverage_df$pct_q2_sym <= 1 + 1e-9), all(coverage_df$pct_mal_sym <= 1 + 1e-9))
+  if (escribir) write_csv(coverage_df, file.path(dir_tablas, "cobertura_interseccion.csv"))
+
+  # ---- Relative abundances ----------------------------------------------------
+  # Per-taxon Spearman: over each pipeline's whole mass (asymmetric denominator).
+  sweep_by <- function(mat, totals_tbl)
+    sweep(mat, 1, totals_tbl$total[match(rownames(mat), totals_tbl$sample_id)], "/")
+  mat_mal_rel <- sweep_by(mat_mal_abs, mal_total_asym)
+  mat_q2_rel  <- sweep_by(mat_q2_abs,  q2_total_asym)
+  # Bray-Curtis, Jaccard, Mantel: renormalized to the shared taxa (rows sum to 1).
+  mat_mal_rel_within <- sweep(mat_mal_abs, 1, rowSums(mat_mal_abs), "/")
+  mat_q2_rel_within  <- sweep(mat_q2_abs,  1, rowSums(mat_q2_abs),  "/")
+
+  # ---- A. Spearman per taxon --------------------------------------------------
+  per_taxon <- map_df(common_taxa, function(tx) {
+    v_mal <- mat_mal_rel[, tx]; v_q2 <- mat_q2_rel[, tx]
+    if (sum(v_mal > 0) < 3 || sum(v_q2 > 0) < 3) {
+      return(tibble(taxon = tx, rho = NA_real_, p = NA_real_,
+                    prev_mal = mean(v_mal > 0), prev_q2 = mean(v_q2 > 0),
+                    mean_mal = mean(v_mal), mean_q2 = mean(v_q2)))
+    }
+    ct <- suppressWarnings(cor.test(v_mal, v_q2, method = "spearman", exact = FALSE))
+    tibble(taxon = tx, rho = unname(ct$estimate), p = ct$p.value,
+           prev_mal = mean(v_mal > 0), prev_q2 = mean(v_q2 > 0),
+           mean_mal = mean(v_mal), mean_q2 = mean(v_q2))
+  }) |>
+    arrange(desc(rho))
+  if (escribir) write_csv(per_taxon, file.path(dir_tablas, "spearman_per_taxon.csv"))
+
+  # ---- B. Top-k Jaccard per specimen ------------------------------------------
+  filas <- seq_len(nrow(mat_mal_rel_within))
+  topk_df <- tibble(
+    sample_id = rownames(mat_mal_rel_within),
+    j_top5  = map_dbl(filas, ~ topk_jaccard(mat_mal_rel_within[.x, ], mat_q2_rel_within[.x, ], 5)),
+    j_top10 = map_dbl(filas, ~ topk_jaccard(mat_mal_rel_within[.x, ], mat_q2_rel_within[.x, ], 10))
+  )
+  if (escribir) write_csv(topk_df, file.path(dir_tablas, "topk_jaccard_per_sample.csv"))
+
+  # ---- C. Paired Bray-Curtis per specimen -------------------------------------
+  bc_paired <- map_dbl(filas, function(i) {
+    v1 <- mat_mal_rel_within[i, ]; v2 <- mat_q2_rel_within[i, ]
+    sum(abs(v1 - v2)) / sum(v1 + v2)
+  })
+  bc_df <- tibble(sample_id = rownames(mat_mal_rel_within), bray_curtis = bc_paired)
+  if (escribir) write_csv(bc_df, file.path(dir_tablas, "bray_curtis_per_sample.csv"))
+
+  # ---- D + E. Mantel and Procrustes -------------------------------------------
+  d_mal <- vegdist(mat_mal_rel_within, method = "bray")
+  d_q2  <- vegdist(mat_q2_rel_within,  method = "bray")
+  set.seed(SEED)
+  mantel_res <- mantel(d_mal, d_q2, method = "spearman", permutations = 999)
+  pcoa_mal  <- cmdscale(d_mal, k = 5, eig = TRUE)
+  pcoa_q2   <- cmdscale(d_q2,  k = 5, eig = TRUE)
+  proc_res  <- procrustes(pcoa_mal$points, pcoa_q2$points, symmetric = TRUE)
+  proc_test <- protest(pcoa_mal$points, pcoa_q2$points, permutations = 999, symmetric = TRUE)
+
+  # ---- Figures (same code, labels and RNG position as v3) ---------------------
+  if (escribir) {
+    ttl <- function(s) paste0(s, "  [", etiqueta, "]")
+
+    p_rho_hist <- per_taxon |> filter(!is.na(rho)) |>
+      ggplot(aes(x = rho)) +
+      geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+      geom_vline(xintercept = c(0.3, 0.7), linetype = "dashed", color = "grey40") +
+      labs(x = "Spearman rho (per taxon)", y = "Numero de taxa",
+           title = ttl("Concordancia per-taxon"),
+           subtitle = sprintf("n = %d taxa compartidos", sum(!is.na(per_taxon$rho)))) +
+      theme_minimal(base_size = 11)
+    p_rho_prev <- per_taxon |> filter(!is.na(rho)) |>
+      mutate(prev_mean = (prev_mal + prev_q2) / 2, abund_mean = (mean_mal + mean_q2) / 2) |>
+      ggplot(aes(x = prev_mean, y = rho, size = abund_mean, label = taxon)) +
+      geom_point(alpha = 0.6, color = "steelblue") +
+      geom_text_repel(data = . %>% filter(rho < 0.3 | prev_mean > 0.4),
+                      size = 2.7, max.overlaps = 25) +
+      geom_hline(yintercept = c(0.3, 0.7), linetype = "dashed", color = "grey40") +
+      scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+      scale_size_continuous(name = "Abundancia\nrelativa media",
+                            labels = scales::percent_format(accuracy = 0.1)) +
+      labs(x = "Prevalencia media", y = "Spearman rho", title = ttl("rho vs prevalencia")) +
+      theme_minimal(base_size = 11)
+    ggsave(file.path(dir_figuras, "fig01_spearman_per_taxon.png"),
+           p_rho_hist + p_rho_prev + plot_layout(widths = c(1, 1.4)),
+           width = 12, height = 5, dpi = 150)
+
+    p_cov <- coverage_df |>
+      select(sample_id, pct_mal_sym, pct_q2_sym) |>
+      pivot_longer(c(pct_mal_sym, pct_q2_sym), names_to = "pipeline", values_to = "pct") |>
+      mutate(pipeline = recode(pipeline, pct_mal_sym = "MaLiAmPi", pct_q2_sym = "QIIME2")) |>
+      ggplot(aes(x = pipeline, y = pct, fill = pipeline)) +
+      geom_violin(alpha = 0.7) +
+      geom_boxplot(width = 0.15, outlier.shape = NA, alpha = 0.6) +
+      geom_jitter(width = 0.05, size = 0.6, alpha = 0.5) +
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1)) +
+      scale_fill_brewer(palette = "Set2", guide = "none") +
+      labs(x = NULL, y = "Fraccion de masa por muestra en taxa compartidos (simetrico)",
+           title = ttl("Cobertura de la interseccion")) +
+      theme_minimal(base_size = 11)
+    ggsave(file.path(dir_figuras, "fig02_cobertura_interseccion.png"),
+           p_cov, width = 6, height = 5, dpi = 150)
+
+    topk_long <- topk_df |>
+      pivot_longer(c(j_top5, j_top10), names_to = "k", values_to = "jaccard") |>
+      mutate(k = recode(k, j_top5 = "Top-5", j_top10 = "Top-10"))
+    p_topk <- ggplot(topk_long, aes(x = k, y = jaccard, fill = k)) +
+      geom_violin(alpha = 0.7) + geom_boxplot(width = 0.15, outlier.shape = NA, alpha = 0.6) +
+      geom_jitter(width = 0.05, size = 0.6, alpha = 0.5) +
+      scale_fill_brewer(palette = "Set1", guide = "none") + ylim(0, 1) +
+      labs(x = NULL, y = "Jaccard top-K", title = ttl("Concordancia top taxa")) +
+      theme_minimal(base_size = 11)
+    p_bc <- ggplot(bc_df, aes(x = "", y = bray_curtis)) +
+      geom_violin(fill = "darkorange", alpha = 0.7) +
+      geom_boxplot(width = 0.15, outlier.shape = NA, alpha = 0.6) +
+      geom_jitter(width = 0.05, size = 0.6, alpha = 0.5) + ylim(0, 1) +
+      labs(x = "Bray-Curtis paired", y = "Distancia BC", title = ttl("BC paired")) +
+      theme_minimal(base_size = 11)
+    ggsave(file.path(dir_figuras, "fig03_per_sample.png"),
+           p_topk + p_bc + plot_layout(widths = c(1.2, 1)), width = 11, height = 5, dpi = 150)
+
+    proc_plot_df <- tibble(
+      sample_id = rownames(mat_mal_rel_within),
+      x_mal = pcoa_mal$points[, 1], y_mal = pcoa_mal$points[, 2],
+      x_q2  = proc_res$Yrot[, 1],   y_q2  = proc_res$Yrot[, 2]
+    )
+    p_proc <- ggplot(proc_plot_df) +
+      geom_segment(aes(x = x_mal, y = y_mal, xend = x_q2, yend = y_q2),
+                   color = "grey60", alpha = 0.6) +
+      geom_point(aes(x = x_mal, y = y_mal), color = "steelblue",  size = 2, alpha = 0.7) +
+      geom_point(aes(x = x_q2,  y = y_q2),  color = "darkorange", size = 2, alpha = 0.7) +
+      labs(x = "PCoA1", y = "PCoA2",
+           title = ttl("Procrustes: MaLiAmPi (azul) vs QIIME2 (naranja)"),
+           subtitle = sprintf("M2 = %.3f, correlacion = %.3f, p = %.3g",
+                              proc_test$ss, proc_test$t0, proc_test$signif)) +
+      theme_minimal(base_size = 11)
+    ggsave(file.path(dir_figuras, "fig04_procrustes_pcoa.png"),
+           p_proc, width = 7, height = 6, dpi = 150)
+  }
+
+  list(etiqueta = etiqueta,
+       n_taxa_mal = length(mal_taxa), n_taxa_q2 = length(q2_taxa),
+       n_shared_samples = length(shared_samples), n_shared_taxa = length(common_taxa),
+       n_direct = length(direct_match), n_curated = length(curated_map),
+       curated_map = curated_map, n_q2_unmapped = length(q2_unmapped),
+       n_mal_unmapped = length(mal_unmapped),
+       coverage_df = coverage_df, per_taxon = per_taxon, topk_df = topk_df,
+       bc_paired = bc_paired, mantel_res = mantel_res, proc_test = proc_test)
+}
+```
+
+## Curation on (this report's variant)
+
+```{r run-on, warning = FALSE}
+# warning = FALSE: ggplot drops the jittered points that land outside the [0, 1] axis
+# of figure 3, and the per-taxon panel the genera without rho; the archived run log
+# records the same messages.
+dir.create(file.path(OUT_DIR, "tables"), recursive = TRUE, showWarnings = FALSE)
+
+# How much of each specimen's QIIME2 mass sits in taxa resolved only above genus.
+q2_nongenus_mass <- prep_on$q2_long_all |>
+  group_by(sample_id) |>
+  summarise(total    = sum(count),
+            nongenus = sum(count[str_detect(tax_name, "^[focdkpr]__")]),
+            .groups = "drop") |>
+  mutate(pct_nongenus = nongenus / total)
+write_csv(q2_nongenus_mass, file.path(OUT_DIR, "tables", "diag_h1_masa_nongenus_qiime2.csv"))
+
+res_on <- list(
+  genus    = run_track(prep_on$mal_long_genus, prep_on$q2_long_genus,
+                       prep_on$curated_template, "genus", dir_out = OUT_DIR),
+  all_taxa = run_track(prep_on$mal_long_all, prep_on$q2_long_all,
+                       prep_on$curated_template, "all_taxa", dir_out = OUT_DIR)
+)
+```
+
+## Curation off (for contrast)
+
+Computed in memory only; the archived directory keeps its report, not its tables.
+
+```{r run-off}
+res_off <- list(
+  genus    = run_track(prep_off$mal_long_genus, prep_off$q2_long_genus,
+                       prep_off$curated_template, "genus"),
+  all_taxa = run_track(prep_off$mal_long_all, prep_off$q2_long_all,
+                       prep_off$curated_template, "all_taxa")
+)
+```
+
+# Results
+
+```{r summary-table}
+mi  <- function(x) sprintf("%.3f [%.3f, %.3f]", median(x), quantile(x, .25), quantile(x, .75))
+resumen <- function(r) {
+  rho <- r$per_taxon$rho
+  c(`Taxa: MaLiAmPi / QIIME2`         = sprintf("%d / %d", r$n_taxa_mal, r$n_taxa_q2),
+    `Shared taxa (direct + curated)`  = sprintf("%d (%d + %d)", r$n_shared_taxa, r$n_direct, r$n_curated),
+    `Specimens compared`              = as.character(r$n_shared_samples),
+    `Coverage MaLiAmPi, median [IQR]` = mi(r$coverage_df$pct_mal_sym),
+    `Coverage QIIME2, median [IQR]`   = mi(r$coverage_df$pct_q2_sym),
+    `Spearman rho per taxon, median [IQR]` = sprintf("%.3f [%.3f, %.3f]",
+      median(rho, na.rm = TRUE), quantile(rho, .25, na.rm = TRUE), quantile(rho, .75, na.rm = TRUE)),
+    `Taxa evaluable / rho > 0.7 / rho < 0.3` = sprintf("%d / %d / %d", sum(!is.na(rho)),
+      sum(rho > 0.7, na.rm = TRUE), sum(rho < 0.3, na.rm = TRUE)),
+    `Jaccard top-5, median [IQR]`     = mi(r$topk_df$j_top5),
+    `Jaccard top-10, median [IQR]`    = mi(r$topk_df$j_top10),
+    `Paired Bray-Curtis, median [IQR]` = mi(r$bc_paired),
+    `Mantel r (p)`                    = sprintf("%.3f (%.3g)", r$mantel_res$statistic, r$mantel_res$signif),
+    `Procrustes correlation, M2 (p)`  = sprintf("%.3f, %.3f (%.3g)", r$proc_test$t0,
+                                                r$proc_test$ss, r$proc_test$signif))
+}
+tibble(statistic = names(resumen(res_on$genus)),
+       `genus, curation on`    = resumen(res_on$genus),
+       `all_taxa, curation on` = resumen(res_on$all_taxa),
+       `genus, curation off`   = resumen(res_off$genus)) |>
+  knitr::kable(align = "lccc")
+```
+
+Coverage is shown in its symmetric form; in the `genus` and `all_taxa` tracks the
+asymmetric form gives the same medians (both are in `cobertura_interseccion.csv`). The
+QIIME2 mass that sits in taxa resolved only above genus has median
+`r sprintf("%.4f", median(q2_nongenus_mass$pct_nongenus))` per specimen.
+
+Curated matches active in the `genus` track:
+`r paste(sprintf("%s ← %s", names(res_on$genus$curated_map), map_chr(res_on$genus$curated_map, paste, collapse = " + ")), collapse = "; ")`.
+
+## Per genus
+
+The `r sum(!is.na(res_on$genus$per_taxon$rho))` genera present in at least 3 specimens
+in both pipelines, by ρ. Prevalence is the share of the 110 specimens carrying the genus;
+abundance is the mean relative abundance.
+
+```{r per-genus}
+res_on$genus$per_taxon |>
+  filter(!is.na(rho)) |>
+  transmute(rank = row_number(), genus = taxon, rho = round(rho, 3),
+            `prevalence QIIME2` = percent(prev_q2, 1), `prevalence MaLiAmPi` = percent(prev_mal, 1),
+            `abundance QIIME2` = percent(mean_q2, 0.01), `abundance MaLiAmPi` = percent(mean_mal, 0.01)) |>
+  knitr::kable(align = "rlrrrrr")
+```
+
+## Figures, `genus` track
+
+```{r figures, echo = FALSE, out.width = "100%"}
+knitr::include_graphics(file.path(OUT_DIR, "figures", "genus",
+  c("fig01_spearman_per_taxon.png", "fig02_cobertura_interseccion.png",
+    "fig03_per_sample.png", "fig04_procrustes_pcoa.png")))
+```
+
+The `all_taxa` figures are in `results/concordance/reproducible/figures/all_taxa/`.
+
+# Reproduction check
+
+## Target numbers
+
+The render stops here if any of these differs from the archived report at its three
+reported decimals.
+
+```{r targets}
+g <- res_on$genus
+targets <- tibble(
+  quantity   = c("Median Spearman rho per genus", "Genera with rho > 0.7",
+                 "Mantel r", "Procrustes correlation", "Shared genera"),
+  archived   = c(0.585, 15, 0.958, 0.925, 65),
+  reproduced = c(median(g$per_taxon$rho, na.rm = TRUE), sum(g$per_taxon$rho > 0.7, na.rm = TRUE),
+                 g$mantel_res$statistic, g$proc_test$t0, g$n_shared_taxa)
+) |>
+  mutate(match = round(reproduced, 3) == archived)
+knitr::kable(targets, digits = 6)
+stopifnot(all(targets$match))
+```
+
+## Archived reports, line by line
+
+v3's report-writing function, unchanged, applied to the results above. Each track's
+block is compared with the corresponding block of the archived report: every count,
+median, IQR and p-value it prints.
+
+```{r reports}
+bloque_track <- function(r) {
+  cov <- r$coverage_df
+  mi  <- function(x) sprintf("median = %.3f, IQR [%.3f, %.3f]",
+                             median(x), quantile(x, .25), quantile(x, .75))
+  c(
+    sprintf("- Taxa MaLiAmPi: %d | Taxa QIIME2: %d", r$n_taxa_mal, r$n_taxa_q2),
+    sprintf("- Muestras compartidas: %d | Taxa compartidos: %d (directo %d; curado %d)",
+            r$n_shared_samples, r$n_shared_taxa, r$n_direct, r$n_curated),
+    "",
+    "### Cobertura de la interseccion",
+    sprintf("- ASIMETRICA  MaLiAmPi: %s", mi(cov$pct_mal_asym)),
+    sprintf("- ASIMETRICA  QIIME2:   %s", mi(cov$pct_q2_asym)),
+    sprintf("- SIMETRICA   MaLiAmPi: %s", mi(cov$pct_mal_sym)),
+    sprintf("- SIMETRICA   QIIME2:   %s", mi(cov$pct_q2_sym)),
+    "",
+    "### Concordancia per-taxon (Spearman)",
+    sprintf("- median rho = %.3f, IQR [%.3f, %.3f] (n = %d evaluables)",
+            median(r$per_taxon$rho, na.rm = TRUE),
+            quantile(r$per_taxon$rho, .25, na.rm = TRUE),
+            quantile(r$per_taxon$rho, .75, na.rm = TRUE),
+            sum(!is.na(r$per_taxon$rho))),
+    sprintf("- rho > 0.7: %d | rho < 0.3: %d",
+            sum(r$per_taxon$rho > 0.7, na.rm = TRUE),
+            sum(r$per_taxon$rho < 0.3, na.rm = TRUE)),
+    "",
+    "### Concordancia per-sample",
+    sprintf("- Jaccard top-5:  %s", mi(r$topk_df$j_top5)),
+    sprintf("- Jaccard top-10: %s", mi(r$topk_df$j_top10)),
+    sprintf("- Bray-Curtis paired: %s", mi(r$bc_paired)),
+    "",
+    "### Estructura comunitaria (inter-muestra)",
+    sprintf("- Mantel r (Spearman): %.3f, p = %.3g", r$mantel_res$statistic, r$mantel_res$signif),
+    sprintf("- Procrustes M2: %.3f, correlacion = %.3f, p = %.3g",
+            r$proc_test$ss, r$proc_test$t0, r$proc_test$signif),
+    ""
+  )
+}
+
+# The archived block of a track: the lines between its heading and the next one.
+bloque_archivado <- function(report, desde, hasta) {
+  l <- read_lines(file.path(AS_RUN, report))
+  l[(which(l == desde) + 1):(which(l == hasta) - 1)]
+}
+
+comparacion <- tribble(
+  ~report,                  ~track,     ~res,
+  "report_curation_on.md",  "genus",    res_on$genus,
+  "report_curation_on.md",  "all_taxa", res_on$all_taxa,
+  "report_curation_off.md", "genus",    res_off$genus,
+  "report_curation_off.md", "all_taxa", res_off$all_taxa
+) |>
+  mutate(
+    archived = map2(report, track, ~ if (.y == "genus")
+      bloque_archivado(.x, "## Generos unicamente", "## Todos los taxa") else
+      bloque_archivado(.x, "## Todos los taxa", "## Outputs")),
+    reproduced = map(res, bloque_track),
+    lines = map_int(archived, ~ sum(nzchar(.x))),
+    identical = map2_lgl(archived, reproduced, identical)
+  )
+knitr::kable(select(comparacion, report, track, `non-empty lines` = lines, identical))
+stopifnot(all(comparacion$identical))
+```
+
+## Archived files
+
+Every table written above against its archived counterpart, by SHA-256. The two lists of
+unmatched taxa are also compared as sets, because this port writes them in C-locale order
+and v3 in the order of the session's locale. Figures are compared too, for information.
+
+```{r files}
+archivos <- c(
+  "tables/diag_h1_masa_nongenus_qiime2.csv",
+  as.vector(outer(c("spearman_per_taxon.csv", "bray_curtis_per_sample.csv",
+                    "topk_jaccard_per_sample.csv", "cobertura_interseccion.csv",
+                    "qiime2_taxa_sin_match.txt", "maliampi_taxa_sin_match.txt"),
+                  c("genus", "all_taxa"), function(f, t) file.path("tables", t, f))),
+  as.vector(outer(c("fig01_spearman_per_taxon.png", "fig02_cobertura_interseccion.png",
+                    "fig03_per_sample.png", "fig04_procrustes_pcoa.png"),
+                  c("genus", "all_taxa"), function(f, t) file.path("figures", t, f)))
+)
+check <- tibble(file = archivos) |>
+  mutate(
+    kind = case_when(str_ends(file, ".png") ~ "figure",
+                     str_ends(file, ".txt") ~ "list", TRUE ~ "table"),
+    `same bytes` = map_lgl(file, ~ sha256(file.path(AS_RUN, .x)) == sha256(file.path(OUT_DIR, .x))),
+    `same set of lines` = map_lgl(file, ~ if (str_ends(.x, ".png")) NA else
+      setequal(read_lines(file.path(AS_RUN, .x)), read_lines(file.path(OUT_DIR, .x))))
+  )
+knitr::kable(check)
+stopifnot(all(check$`same bytes`[check$kind == "table"]),
+          all(check$`same set of lines`[check$kind == "list"]))
+```
+
+# Session
+
+```{r session}
+sessionInfo()
+```

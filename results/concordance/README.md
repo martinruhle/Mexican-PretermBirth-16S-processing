@@ -9,9 +9,9 @@ numbers behind it.
 The outputs exactly as produced on 2026-09-21 by
 [`analysis/as_run/gate_qiime2_maliampi_v3.R`](../../analysis/as_run/gate_qiime2_maliampi_v3.R),
 copied here unchanged. These results use the canonical specimen map, with every
-MaLiAmPi ↔ QIIME2 pairing verified. They are the **target** that the forthcoming
-reproducible report has to reproduce, in the same way a baseline is kept before a
-refactor.
+MaLiAmPi ↔ QIIME2 pairing verified. They are the **target** that the reproducible
+report, [`analysis/concordance_qiime2_maliampi.Rmd`](../../analysis/concordance_qiime2_maliampi.Rmd),
+has to reproduce, in the same way a baseline is kept before a refactor.
 
 Same layout as the May directory below, plus two logs:
 
@@ -45,11 +45,14 @@ Nothing here is a per-participant abundance table: the tables carry one row per 
 or one derived statistic per specimen. See
 [`docs/DATA_ACCESS.md`](../../docs/DATA_ACCESS.md).
 
-## What will land next to it
+## `reproducible/` — written by the reproducible report
 
-`analysis/concordance_qiime2_maliampi.Rmd` and its rendered HTML, which must reproduce
-`as_run_2026-09-21/`, with relative paths,
-a fixed seed and `sessionInfo()`, plus the aggregated table it produces. Until that
-exists, this analysis is documented and archived but **not reproducible from this
-repository** — the distinction is deliberate and is stated wherever the results are
-quoted.
+The tables and figures that
+[`analysis/concordance_qiime2_maliampi.Rmd`](../../analysis/concordance_qiime2_maliampi.Rmd)
+writes each time it is rendered. The layout and file names are those of
+`as_run_2026-09-21/`, so the two directories can be compared file by file, and the report
+makes that comparison itself. As rendered on 2026-10-01, every table and figure is
+identical byte for byte to its `as_run_2026-09-21/` counterpart. The one exception is
+order: three of the four `*_sin_match.txt` lists hold the same lines in C-locale order.
+There are no `report_*.md` files here; the rendered HTML next to the `.Rmd` takes their
+place.
