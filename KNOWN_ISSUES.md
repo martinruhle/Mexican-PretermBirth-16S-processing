@@ -78,7 +78,10 @@ itself dropped nothing (`failed_specimens.csv` is empty).
 
 ## 7. The QIIME2 side of the input chain is undocumented
 
-**Status:** open. **Blocks:** reproducing the concordance analysis from scratch.
+**Status:** open. **Blocks:** re-deriving the matrices of the analysis compendium
+([`Mexican-PretermBirth-analysis`](https://github.com/martinruhle/Mexican-PretermBirth-analysis))
+from the raw QIIME2 export. It no longer blocks the concordance, which re-runs from that
+export ([`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md)).
 
 The May concordance run consumed `genus_rel_filtered_conc_2026-03-06_abs.csv`, which is
 **not** the matrix behind the published manuscript
@@ -209,4 +212,4 @@ found needs updating, but the manuscript PDF was not searched.
 
 ---
 
-*Last updated 2026-09-26.*
+*Last updated 2026-10-07.*
