@@ -23,9 +23,12 @@ Two consequences:
   not the same object, and no lookup table can make them so.
 
 The planned external validation is bidirectional — train on the Mexican cohort, apply
-to the DREAM hispanic subgroup (about 50 participants), and the reverse. That requires
-both cohorts to be described in **one** phylotype space. Hence: re-place our sequence
-variants against the DREAM reference package.
+to the DREAM Hispanic subgroup, and the reverse. That subgroup is **38 participants**:
+those recorded as "Hispanic or Latino" in the subject table of ImmPort study SDY2187
+(release DR61), all of them in the Challenge's validation set; the earlier version of that
+set had 42 (§3b). Either direction
+requires both cohorts to be described in **one** phylotype space. Hence: re-place our
+sequence variants against the DREAM reference package.
 
 This is not an improvised manoeuvre: the Challenge itself added two independent
 validation datasets *post hoc*, after the training set had been built, by placing them on
@@ -65,8 +68,8 @@ The rest of this document assumes Option A.
 
 ## 3b. Where the DREAM reference package is not
 
-Checked on 2026-09-24. Recorded because a dead end that is not written down gets searched
-again:
+Checked on 2026-09-24; the study archives, on 2026-10-12. Recorded because a dead end that
+is not written down gets searched again:
 
 | Source | What is actually there |
 |---|---|
@@ -74,17 +77,46 @@ again:
 | `doi.org/10.5281/zenodo.10015300` — what the paper's key resources table cites as "MaLiAmPi" | Resolves to **jgolob/arf** v0.1, the ARF allele-filtering tool, not MaLiAmPi. The same ARF whose release we used to build our own package ([`REFPKG_PROVENANCE.md`](REFPKG_PROVENANCE.md)). The DOI printed next to "MaLiAmPi" resolves to ARF; the MaLiAmPi release is record `8329650`, above |
 | Golob et al. 2024, *Cell Rep Med* 5(1):101359, "Data and code availability" (pp. 17–18) | Lists the nine source studies, the harmonized data (March of Dimes database, study **SDY2187**, via pretermbirthdb.org), the VMAP viewer, and the MaLiAmPi code. **No reference package is deposited anywhere in the list** |
 | Synapse `syn26133770` | The Challenge project exists and its wiki is public; registration is closed and the data sit behind registration. Nothing in the public wiki mentions a reference package |
+| ImmPort study **SDY2187**, release DR61: the archive downloaded from the study page on 2026-09-24 (`immport_SDY2187_20260924_1637.zip`, 1.1 MB, SHA-256 `a589ff99bad36261…`) | Only the release's **metadata package**: ImmPort's own tables for the study (subjects, arms, links, publications) and a "MaLiAmPi protocol" file that is a single link to `github.com/jgolob/maliampi`. The study data are separate study files, listed in the package manifest but not part of the archive: `Training.zip` (47 MB, MD5 `cfed9839b8636352c910789fe5757863`), `Validation.zip` (3.2 MB, MD5 `ce12eec5a51d4cf7db67dfebc9850b88`, "Updated version: 12/13/2024") and a participant-ID mapping. The study-files page still offers the earlier `Validation.zip` (3.5 MB, dated 2023-11-30) next to the current one (dated 2025-01-09). On 2026-10-12 the download page offered the same DR61 release files, identical in size and MD5 to the ones in this archive. The subject table (750 participants) records ethnicity as "Hispanic or Latino" for 38 and "Not Hispanic or Latino" for 95, all in the two validation arms; the other 617 are "Not Specified", among them all 616 in the training arms |
+| Synapse wiki `618025` of `syn26133770`, "Data Description": the page ImmPort links from SDY2187 as "README and Dictionary for data files" | Describes the contents of `Training.zip` and `Validation.zip` file by file: alpha diversity, VALENCIA community state types, `metadata.csv`, KRD distances, phylotype tables at the three distances, the mapping of each sequence variant to its phylotype (`pt.1e-1.csv`, `pt.5e-1.csv`, `pt.1e0.csv`), reads per specimen and sequence variant (`sp_sv_long.csv`) and a taxonomic assignment per variant (`sv_taxonomy.csv`). **No reference package, tree or placement file, and no file with the variants' nucleotide sequences.** The list is not a full inventory: it names 23 files and leaves out `sv_counts/sv.fasta`, `phylotypes/pt_sp.*.csv`, `cst_valencia_dummies.csv` and `metadata_normalized.csv`, which `Training.zip` contains (next row) |
+| `Training.zip`, the version in the DR61 manifest (MD5 identical) | 29 files: the 23 in the dictionary, `metadata_normalized.csv`, `cst_valencia_dummies.csv`, three `pt_sp.*.csv` (a species label per phylotype) and **`sv_counts/sv.fasta`, the nucleotide sequences of 53,129 variants** (`combinedsv___#####`), among them all 15,343 that appear in the training tables. **No reference package, tree or placement file.** Its `metadata.csv` covers 616 participants, with ethnicity "Unknown" for all of them |
+| `Validation.zip`, the current version (dated 2025-01-09; the one in the DR61 manifest, MD5 identical) | 31 files: the 23 in the dictionary, `metadata_normalized.csv`, `cst_valencia_dummies.csv` and six `taxonomy_*.full.csv`; **no `sv.fasta`** and no `pt_sp.*.csv`. Its 2,358 variants have their own identifiers (`validation_sv_#####`), and `pt.*.csv` assigns them to phylotypes in the training numbering: at distance 0.1 they fall into 725 phylotypes, 672 of which also appear in the training tables. **No reference package, tree or placement file.** Its `metadata.csv` covers 134 participants and has no ethnicity column |
+| `Validation.zip`, the earlier version (dated 2023-11-30; 3.7 MB, MD5 `d21489d51cce74d4672a9ec3aaae6d91`) | The same 31 file names, also without `sv.fasta`. 148 participants: the 134 above and 14 that the update removed. Its `metadata.csv` still has an ethnicity column (42 "Hispanic or Latino", 105 "Not Hispanic or Latino", 1 "Unknown") |
 
 What the Challenge distributed to participants were **phylotype and taxonomy tables**, not
 the package they were derived from. That is consistent: participants never needed to place
-anything themselves.
+anything themselves. Two facts from these files bear on both options in §3:
 
-Remaining routes, in the order they are worth trying:
+- The phylotypes are groups of the Challenge's own variants ("Phylotypes were generated by
+  clustering amplicon sequence variants at three phylogenetic distances"), and `pt.*.csv`
+  records which variant went to which group. The validation variants, which have
+  identifiers of their own, were assigned to phylotypes of the same numbering.
+- The sequences of the training variants are distributed (`sv.fasta`); those of the
+  validation variants are not, in either version. Option B can therefore
+  reach the training set without raw reads, but not the validation set, which is where
+  every participant with a recorded ethnicity is.
+
+Ethnicity, by source. The current `metadata.csv` has no ethnicity column, so ImmPort's
+subject table (DR61) is the only current source: 38 "Hispanic or Latino", 95 "Not Hispanic
+or Latino" and 1 "Not Specified" among the 134 validation participants. The fourth study
+file, `IDmapping_participantID_ImmPortSUBacc.txt`, links all 134 to their rows in the
+current `Validation.zip`; 37 of the 38 belong to one of its two datasets. The earlier
+`metadata.csv` agrees with the subject table on all 134 participants the two share; its 42
+include four of the 14 participants the update removed. Training records no ethnicity in
+any source.
+
+Routes, in the order they are worth trying, and where each stands:
 
 1. **Ask.** The paper names the lead contact (Marina Sirota) and MaLiAmPi's author
    (Jonathan Golob), and states that additional information needed to reanalyse the data
    is available from the lead contact on request. A reference package is a small file.
-2. **Register** on Synapse / pretermbirthdb and look inside SDY2187 for it.
+   **Asked on 2026-09-24**, by email to the authors: whether the reference package can be
+   shared, and whether it is in fact what is needed to bring our samples into the
+   Challenge's phylotype space. No reply as of 2026-10-12.
+2. **Register** on Synapse / pretermbirthdb and look inside SDY2187 for it. **Checked**:
+   the ImmPort metadata package and the data dictionary on 2026-09-24, `Training.zip` and
+   both versions of `Validation.zip` on 2026-10-12 (table above). None of them contains it.
+   That covers every file the SDY2187 download page offers.
 3. **Rebuild** it with ARF and MaLiAmPi. This produces *a* package from the same tooling,
    not *the* package, so phylotype identifiers still would not transfer. It is the
    fallback of last resort, and it does not satisfy the objective.
@@ -121,7 +153,7 @@ Each is a separate piece of work with its own product. None has been done.
 | # | Task | Product that proves it is done |
 |---|---|---|
 | 1 | Decide between Option A and Option B (§3) and write the decision down, with the reason. | A dated paragraph in this document naming the chosen direction. Nothing else in this table should start before it. |
-| 2 | Obtain the DREAM Challenge reference package. **Partly answered on 2026-09-24 — see §3b. It is not published anywhere we can find; what remains is to ask the authors.** | The archive on disk, plus a row in this document giving origin, retrieval date, version or release tag, and SHA-256. If it turns out not to be distributable, that answer is recorded here instead — a documented dead end closes the objective just as well as a download. |
+| 2 | Obtain the DREAM Challenge reference package. **Partly answered on 2026-09-24 — see §3b. It is not published anywhere we can find. The authors were asked for it by email on 2026-09-24; no reply as of 2026-10-12.** | The archive on disk, plus a row in this document giving origin, retrieval date, version or release tag, and SHA-256. If it turns out not to be distributable, that answer is recorded here instead — a documented dead end closes the objective just as well as a download. |
 | 3 | Compare the two reference packages. | `Rscript scripts/describe_refpkg.R` run on both, outputs saved side by side under `metadata/`, and a short verdict: how many reference sequences each has, how much of the taxonomy they share, and whether re-placement is worth the compute. |
 | 4 | Re-run placement and classification with the DREAM reference package, reusing the existing sequence variants. **The parameter question is answered — see §3c. The version we ran has no such parameter; current `master` has `--refpkg` but re-runs DADA2.** | A second output directory, its own manifest under `metadata/`, and a run record written the same way as [`RUN_MALIAMPI.md`](RUN_MALIAMPI.md). |
 | 5 | Bin the placements into phylotypes at 0.1, 0.5 and 1.0 — using the same phylogenetic distance criterion the Challenge used, not our own. | Phylotype tables, their dimensions recorded, and the thresholds documented. |
@@ -134,7 +166,7 @@ None of these is resolved, and each can block the stage on its own.
 
 | # | Question | How to answer it |
 |---|---|---|
-| 1 | ~~Is the DREAM reference package downloadable at all?~~ **Answered 2026-09-24: not from any published source (§3b).** The article publishes the MaLiAmPi code, not the package built with it. | Remaining: ask the authors; failing that, register and look inside SDY2187. |
+| 1 | ~~Is the DREAM reference package downloadable at all?~~ **Answered 2026-09-24: not from any published source (§3b).** The article publishes the MaLiAmPi code, not the package built with it. | The authors were asked by email on 2026-09-24; no reply as of 2026-10-12. The ImmPort SDY2187 metadata package and the data dictionary were checked the same day, and the study archives on 2026-10-12; none of them has it (§3b). |
 | 2 | **What data use agreement does Synapse require?** | The Challenge data were aggregated from dbGaP and the March of Dimes database; part of it may need a formal access request with a turnaround of weeks to months. **This is the largest schedule risk in the whole stage, and it is administrative, not technical.** Start it before anything else. |
 | 3 | Are the DREAM FASTQ files needed at all, or do their published feature tables suffice? | If the goal is comparing composition, or validating models, the published phylotype tables may be enough — which removes question 2 entirely. The raw sequences are only needed for Option B. Answering this first may dissolve the biggest risk. |
 | 4 | Does the DREAM reference package cover V3–V4? | Conceptually yes: the tree is built from full-length 16S alleles, which is exactly why harmonising across different variable regions works. Confirm on inspection anyway. |
@@ -158,7 +190,7 @@ A colleague should be able to confirm, without asking anyone:
 
 - **The reference package is not publicly distributed** (§3b, checked 2026-09-24). The
   Challenge released phylotype *tables*. This has moved from a risk to a finding: the
-  stage now depends on a request to the authors. If that fails, the fallback is to
+  stage now depends on the request made to the authors on 2026-09-24. If that fails, the fallback is to
   compare in a space that does transfer —
   species-level tables and VALENCIA community state types — and to say plainly that
   phylotype-level pooling was not possible.
@@ -180,5 +212,6 @@ A colleague should be able to confirm, without asking anyone:
 |---|---|
 | Written | 2026-08-30 |
 | Sources checked, §3b and §3c added | 2026-09-24 |
+| ImmPort SDY2187, its data dictionary and the study archives added to §3b; request to the authors and size of the Hispanic subgroup recorded | 2026-10-12 |
 | Status | not started; blocked on preconditions 1 and 2 |
 | Reviewed by | *pending* |
