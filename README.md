@@ -27,7 +27,7 @@ cleanly.
 | What exactly was run, on what, with what, and what it produced | [`docs/RUN_MALIAMPI.md`](docs/RUN_MALIAMPI.md) |
 | Whether MaLiAmPi and QIIME2 see the same microbiome | [`docs/CONCORDANCE_QIIME2_MALIAMPI.md`](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | What comes next and why it has not happened yet | [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
-| Why the earlier sequencing run cannot go through the same pipeline | [`docs/NEXT_STAGE_OLD_RUN.md`](docs/NEXT_STAGE_OLD_RUN.md) |
+| Why the earlier sequencing run cannot go through the same pipeline | [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
 | What is still unresolved about this run | [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) |
 | Where the actual data is, since it is not here | [`docs/DATA_ACCESS.md`](docs/DATA_ACCESS.md) |
 | Which software versions are pinned, and which are not yet | [`env/VERSIONS.md`](env/VERSIONS.md) |
@@ -74,7 +74,7 @@ median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values 
 | QIIME2 ↔ MaLiAmPi concordance | ✅ reproducible from this repository (2026-10-01): [`analysis/concordance_qiime2_maliampi.Rmd`](analysis/concordance_qiime2_maliampi.Rmd) returns the archived numbers and tables from three hash-checked inputs — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | Software environment for the downstream tooling | ⚠️ partially pinned — [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Phylotype binning (0.1 / 0.5 / 1.0) | 🚧 not started |
-| **Extending the cohort with the earlier sequencing run** | 🚧 planned, and it needs a different route — [`docs/NEXT_STAGE_OLD_RUN.md`](docs/NEXT_STAGE_OLD_RUN.md) |
+| **Extending the cohort with the earlier sequencing run** | 🚧 planned, and it needs a different route — [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
 | **Re-placement against the DREAM Challenge reference package** | 🚧 **not started** — [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
 | External validation against the DREAM hispanic subgroup | 🚧 blocked on the two rows above |
 

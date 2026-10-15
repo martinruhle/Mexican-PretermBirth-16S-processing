@@ -144,7 +144,7 @@ everything documented here. Placing the existing `sv/dada2.sv.fasta` (21,382 var
 SHA-256 `d2ef8ad7…`) on the DREAM package with `cmalign` + `pplacer` directly — outside
 the workflow, in the same containers the run used — preserves the chain. That is the same
 reasoning, for the same reason, as in
-[`NEXT_STAGE_OLD_RUN.md` §3](NEXT_STAGE_OLD_RUN.md).
+[`NEXT_STAGE_MICHIGAN_COHORT.md` §3](NEXT_STAGE_MICHIGAN_COHORT.md).
 
 ## 4. Preconditions, in order
 
