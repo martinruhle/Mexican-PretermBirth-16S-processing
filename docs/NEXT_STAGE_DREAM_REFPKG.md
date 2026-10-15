@@ -25,10 +25,11 @@ Two consequences:
 The planned external validation is bidirectional — train on the Mexican cohort, apply
 to the DREAM Hispanic subgroup, and the reverse. That subgroup is **38 participants**:
 those recorded as "Hispanic or Latino" in the subject table of ImmPort study SDY2187
-(release DR61), all of them in the Challenge's validation set; the earlier version of that
-set had 42 (§3b). Either direction
-requires both cohorts to be described in **one** phylotype space. Hence: re-place our
-sequence variants against the DREAM reference package.
+(release DR61), all of them in the Challenge's validation set, and 15 of them in the study's
+"Preterm Validation" arm; the earlier version of that set had 42 (§3b). At phylotype level,
+either direction requires both cohorts to be described in **one** phylotype space; at genus
+and species level it does not, because names transfer. On whose reference package that one
+space is built is the choice §3 records.
 
 This is not an improvised manoeuvre: the Challenge itself added two independent
 validation datasets *post hoc*, after the training set had been built, by placing them on
@@ -45,26 +46,104 @@ the same reference tree. The mechanism needed here is the same one.
 
 ## 3. The direction has to be chosen first
 
-There are two ways to put both cohorts in one feature space. They are **mutually
-exclusive**, and the features they produce **cannot be mixed in the same model**.
+There are two ways to put both cohorts in one feature space. They lead to **different
+feature spaces**, and the features they produce **cannot be mixed in the same model**.
 
 **Option A — place our sequence variants on the DREAM reference package.**
-What the objective as currently written asks for. Our data land directly in the
+What the objective as first written asked for. Our data land directly in the
 Challenge's feature space, so the models published with the Challenge apply without
 retraining. Requires obtaining their reference package.
 
 **Option B — place the DREAM sequence variants on our reference package.**
-Does not depend on obtaining anything from the Challenge, but requires their raw
-sequences, part of which are under controlled access, and the results are then **not**
-comparable with the Challenge's published models.
+Needs the nucleotide sequences of the Challenge's variants, not their raw reads, and the
+Challenge's two sets differ in whether they carry them (§3b). The **training set** can be
+placed without asking anyone: `Training.zip` carries the sequences of its 53,129 variants
+(`sv_counts/sv.fasta`). The **validation set** cannot: neither version of `Validation.zip`
+carries the sequences of its 2,358 variants, and that set is where every participant with a
+recorded ethnicity is, the 38 Hispanic participants included. The phylotypes this produces
+are ours, **not** the Challenge's, so a published Challenge model built on phylotype
+features cannot be applied to them.
 
 > **This is a live inconsistency in the project's own plans, not a hypothetical.** The
 > earlier plan for the Michigan dataset was Option B — place Michigan on our reference
 > package. The objective as written now is Option A. Changing direction is legitimate;
 > running both and mixing the outputs is not. **Decide which is the main line before any
-> code is written**, and record the decision here.
+> code is written**, and record the decision here. **Decided on 2026-10-15; see below.**
 
-The rest of this document assumes Option A.
+**Decision, 2026-10-15.** Both directions are used, each for what the other cannot do, and
+their outputs are never mixed: separate directories, separate manifests, never in the same
+model.
+
+- **Option B is the main line.** Our cohort's phylotypes are cut from its placements on our
+  own reference package and can be generated now, both for the internal analysis and as the
+  space in which this project's models are validated at phylotype level. The Michigan
+  cohort is placed once, on the same package, by the route of
+  [`NEXT_STAGE_MICHIGAN_COHORT.md` §3](NEXT_STAGE_MICHIGAN_COHORT.md). The Challenge's
+  training set can be placed on it now, directly with `cmalign` and `pplacer` as in §3c.
+  Its validation set can be reached at phylotype level only if the authors send the
+  sequences of its 2,358 variants.
+- **Option A is a second line, conditional on the authors sending their reference
+  package.** It is kept for what Option B cannot do: applying the Challenge's own models to
+  our data, if those models use phylotype features (not yet checked), and reaching the
+  validation set at phylotype level if its sequences do not arrive. Michigan is placed on
+  that package too only if this line needs it. None of our 21,382 variants is identical to
+  any of the Challenge's 53,129. Most of the 15,343 training variants that have a phylotype
+  are V4-length (median 253 bp), though, and 568 of them occur, base for base and in the
+  same orientation, inside variants of ours that carry 91.5 % of our reads. Looked up
+  through `pt.*.csv`, they point to a single phylotype for 45 % of our reads at distance
+  0.1, 68 % at 0.5 and 88 % at 1.0 (checked on 2026-10-15). That is a partial way into the
+  Challenge's numbering without the package, coarser the more of our reads it covers;
+  whether it can stand in for placement has not been evaluated.
+- **Genus, species and VALENCIA community state types need neither option.** Names transfer
+  (§1), and both archives carry genus- and species-level tables
+  (`taxonomy/taxonomy_relabd.genus.csv`, `taxonomy_relabd.species.csv`), labelled like
+  ours by MaLiAmPi from the NCBI taxonomy, though not necessarily from the same release of
+  it. Comparing them takes a crosswalk of names, not a reference package. This is the
+  comparison §6 holds in reserve, and it can start now: for our cohort, for both sets of
+  the Challenge, the 38 Hispanic participants included, and, once its reads are processed,
+  for Michigan. On our side it uses the MaLiAmPi tables; the QIIME2 tables of the published
+  analysis are labelled from SILVA
+  ([`CONCORDANCE_QIIME2_MALIAMPI.md`](CONCORDANCE_QIIME2_MALIAMPI.md) measures how far the
+  two agree).
+
+**Why B is the main line.** It is the only complete phylotype-level route that waits on no
+one. Without any reply it already puts our cohort, Michigan and the Challenge's training set
+in one space; without the package, Option A can place neither of our cohorts in the
+Challenge's, and the lookup above reaches only part of our reads. For the Hispanic subgroup
+at phylotype level the two depend on the authors equally, A on the package and B on 2,358
+sequences, and the reminder asks for either. Validating this project's own models needs one
+shared space, not the Challenge's; only the Challenge's own models need theirs, and only if
+they use phylotypes. The known weakness of B is coverage:
+our package was recruited for our own variants (5,540 reference sequences,
+[`REFPKG_PROVENANCE.md`](REFPKG_PROVENANCE.md)), so Challenge variants from taxa absent from
+our cohort will be placed far from any reference. How much of the training set's reads our
+package places and classifies has to be measured before any Challenge phylotype from this
+line is used.
+
+**What is missing for each.** Option A: the Challenge's reference package, which is not
+published (§3b); it was requested from the authors on 2026-09-24, with a reminder on
+2026-10-15, and whether the package alone is enough was part of the same request. Option B:
+nothing for our cohort, Michigan or the training set; for the validation set, the sequences
+of its 2,358 variants, which the reminder asks for as an alternative. Genus and species:
+nothing beyond the crosswalk.
+
+**Our phylotypes, and what a switch would redo.** Phylotype binning of our cohort at 0.1,
+0.5 and 1.0 can go ahead on our package. Because the Challenge's training set and Michigan
+join this space later, the binning has to record how variants placed afterwards are
+assigned to the existing phylotypes, as the Challenge did for its validation set (§3b);
+binning all the sets together afterwards could renumber them. If the main line ever moved
+to Option A (for instance, if the package arrives, the validation sequences do not, and the
+Hispanic subgroup at phylotype level becomes the priority), the following would be redone:
+the placement of our 21,382 variants and of Michigan on the Challenge's package, the
+phylotypes in the Challenge's numbering, VALENCIA on the species tables that placement
+yields, and every model fitted on phylotype features. The genus- and species-level work
+would stand.
+
+The rest of this document, from §3b on, describes the Option A line: where its reference
+package is not, what the pipeline can take, and what the line would require if it runs.
+§3b also bears on Option B where it says so, and the direct placement of §3c is how Option
+B places the training set. The Option B line and the genus- and species-level comparison
+have no plan of their own yet.
 
 ## 3b. Where the DREAM reference package is not
 
@@ -112,7 +191,9 @@ Routes, in the order they are worth trying, and where each stands:
    is available from the lead contact on request. A reference package is a small file.
    **Asked on 2026-09-24**, by email to the authors: whether the reference package can be
    shared, and whether it is in fact what is needed to bring our samples into the
-   Challenge's phylotype space. No reply as of 2026-10-12.
+   Challenge's phylotype space. No reply as of 2026-10-12. **Reminder sent on 2026-10-15**,
+   which also asks, as an alternative, for the sequences of the 2,358 validation variants:
+   what Option B needs to reach the validation set (§3).
 2. **Register** on Synapse / pretermbirthdb and look inside SDY2187 for it. **Checked**:
    the ImmPort metadata package and the data dictionary on 2026-09-24, `Training.zip` and
    both versions of `Validation.zip` on 2026-10-12 (table above). None of them contains it.
@@ -148,12 +229,13 @@ reasoning, for the same reason, as in
 
 ## 4. Preconditions, in order
 
-Each is a separate piece of work with its own product. None has been done.
+Each is a separate piece of work with its own product. Precondition 1 was settled on
+2026-10-15; none of the others has been done.
 
 | # | Task | Product that proves it is done |
 |---|---|---|
-| 1 | Decide between Option A and Option B (§3) and write the decision down, with the reason. | A dated paragraph in this document naming the chosen direction. Nothing else in this table should start before it. |
-| 2 | Obtain the DREAM Challenge reference package. **Partly answered on 2026-09-24 — see §3b. It is not published anywhere we can find. The authors were asked for it by email on 2026-09-24; no reply as of 2026-10-12.** | The archive on disk, plus a row in this document giving origin, retrieval date, version or release tag, and SHA-256. If it turns out not to be distributable, that answer is recorded here instead — a documented dead end closes the objective just as well as a download. |
+| 1 | Decide between Option A and Option B (§3) and write the decision down, with the reason. **Decided on 2026-10-15 (§3): Option B is the main line; preconditions 2 to 7 are the Option A line.** | A dated paragraph in this document naming the chosen direction. Nothing else in this table should start before it. |
+| 2 | Obtain the DREAM Challenge reference package. **Partly answered on 2026-09-24 — see §3b. It is not published anywhere we can find. The authors were asked for it by email on 2026-09-24; no reply as of 2026-10-12; reminder sent on 2026-10-15.** | The archive on disk, plus a row in this document giving origin, retrieval date, version or release tag, and SHA-256. If it turns out not to be distributable, that answer is recorded here instead — a documented dead end closes the objective just as well as a download. |
 | 3 | Compare the two reference packages. | `Rscript scripts/describe_refpkg.R` run on both, outputs saved side by side under `metadata/`, and a short verdict: how many reference sequences each has, how much of the taxonomy they share, and whether re-placement is worth the compute. |
 | 4 | Re-run placement and classification with the DREAM reference package, reusing the existing sequence variants. **The parameter question is answered — see §3c. The version we ran has no such parameter; current `master` has `--refpkg` but re-runs DADA2.** | A second output directory, its own manifest under `metadata/`, and a run record written the same way as [`RUN_MALIAMPI.md`](RUN_MALIAMPI.md). |
 | 5 | Bin the placements into phylotypes at 0.1, 0.5 and 1.0 — using the same phylogenetic distance criterion the Challenge used, not our own. | Phylotype tables, their dimensions recorded, and the thresholds documented. |
@@ -166,9 +248,9 @@ None of these is resolved, and each can block the stage on its own.
 
 | # | Question | How to answer it |
 |---|---|---|
-| 1 | ~~Is the DREAM reference package downloadable at all?~~ **Answered 2026-09-24: not from any published source (§3b).** The article publishes the MaLiAmPi code, not the package built with it. | The authors were asked by email on 2026-09-24; no reply as of 2026-10-12. The ImmPort SDY2187 metadata package and the data dictionary were checked the same day, and the study archives on 2026-10-12; none of them has it (§3b). |
+| 1 | ~~Is the DREAM reference package downloadable at all?~~ **Answered 2026-09-24: not from any published source (§3b).** The article publishes the MaLiAmPi code, not the package built with it. | The authors were asked by email on 2026-09-24; no reply as of 2026-10-12; reminder sent on 2026-10-15. The ImmPort SDY2187 metadata package and the data dictionary were checked the same day, and the study archives on 2026-10-12; none of them has it (§3b). |
 | 2 | **What data use agreement does Synapse require?** | The Challenge data were aggregated from dbGaP and the March of Dimes database; part of it may need a formal access request with a turnaround of weeks to months. **This is the largest schedule risk in the whole stage, and it is administrative, not technical.** Start it before anything else. |
-| 3 | Are the DREAM FASTQ files needed at all, or do their published feature tables suffice? | If the goal is comparing composition, or validating models, the published phylotype tables may be enough — which removes question 2 entirely. The raw sequences are only needed for Option B. Answering this first may dissolve the biggest risk. |
+| 3 | Are the DREAM FASTQ files needed at all, or do their published feature tables suffice? | If the goal is comparing composition, or validating models, the published phylotype tables may be enough — which removes question 2 entirely. Option B needs the variants' sequences, not the raw reads (§3). Answering this first may dissolve the biggest risk. |
 | 4 | Does the DREAM reference package cover V3–V4? | Conceptually yes: the tree is built from full-length 16S alleles, which is exactly why harmonising across different variable regions works. Confirm on inspection anyway. |
 
 ## 5. Acceptance criteria for the stage as a whole
@@ -193,7 +275,8 @@ A colleague should be able to confirm, without asking anyone:
   stage now depends on the request made to the authors on 2026-09-24. If that fails, the fallback is to
   compare in a space that does transfer —
   species-level tables and VALENCIA community state types — and to say plainly that
-  phylotype-level pooling was not possible.
+  phylotype-level pooling was not possible. That comparison needs neither reference
+  package and does not have to wait for the reply (§3).
 - **The reference packages may differ enough that re-placement changes the taxonomy
   too**, not only the phylotypes. If so, the genus-level concordance already
   established for QIIME2 versus MaLiAmPi has to be repeated for the new placement
@@ -213,5 +296,6 @@ A colleague should be able to confirm, without asking anyone:
 | Written | 2026-08-30 |
 | Sources checked, §3b and §3c added | 2026-09-24 |
 | ImmPort SDY2187, its data dictionary and the study archives added to §3b; request to the authors and size of the Hispanic subgroup recorded | 2026-10-12 |
-| Status | not started; blocked on preconditions 1 and 2 |
+| Direction decided in §3: Option B the main line, Option A a separate line conditional on the authors' reply; reminder to the authors recorded | 2026-10-15 |
+| Status | not started; precondition 1 settled (§3); the Option A line is blocked on precondition 2 |
 | Reviewed by | *pending* |
