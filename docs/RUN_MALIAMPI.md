@@ -185,31 +185,73 @@ SHA-256, is listed in
 | `placement/pca/epca.*`, `placement/pca/lpca.*` | edge PCA and length PCA projections | 11 MB |
 | `classify/classify.mcc.db` | full classification database | 1.1 GB |
 | `classify/sv_taxonomy.csv` | taxonomy assigned to each SV | 46 MB |
-| `classify/tables/tallies_wide.<rank>.csv` | **taxon × specimen matrices of pplacer weights** — see the warning below | ≤ 251 KB |
-| `classify/tables/by_specimen.<rank>.csv`, `classify/tables/by_taxon.<rank>.csv` | the same tallies in long form, with placement frequency | ≤ 665 KB |
+| `classify/tables/tallies_wide.<rank>.csv` | **taxon × specimen matrices of DADA2 read counts**, one label per sequence variant — see below | ≤ 251 KB |
+| `classify/tables/by_specimen.<rank>.csv` | the non-zero cells of `tallies_wide`, one row per specimen × taxon, with the number of variants and the fraction of the specimen's reads | ≤ 665 KB |
+| `classify/tables/by_taxon.<rank>.csv` | one row per taxon: those columns summed over specimens, and their means over the 111 specimens | ≤ 97 KB |
 
 Table dimensions, counted directly from the files:
 
 | Rank | Taxa | Specimens |
 |---|---|---|
+| phylum | 87 | 111 |
+| class | 138 | 111 |
+| order | 214 | 111 |
+| family | 320 | 111 |
 | genus | **547** | 111 |
 | species | **913** | 111 |
 
 (`tallies_wide.*` carries three leading columns — `tax_name`, `tax_id`, `rank` — before
-the 111 specimen columns.)
+the 111 specimen columns; all 114 columns are named, at every rank.)
 
-> ### ⚠️ `tallies_wide.*` does not contain read counts
->
-> The values are **weights redistributed by pplacer** across the taxa a sequence variant
-> could belong to, under the `hybrid2` classifier. Two consequences:
->
-> - Per-specimen totals in `tallies_wide.*` can **exceed** the DADA2 read counts for that
->   specimen. This is expected behaviour, not corrupted data.
-> - A histogram of "reads per specimen" built on `tallies_wide.*` is **not** a histogram
->   of reads. For read counts, use `sv/dada2.specimen.sv.long.csv`.
->
-> `tallies_wide.species.csv` also carries an unnamed phantom column, an artefact of how
-> the CSV is written. It affects parsing, not integrity.
+### What the taxonomic tables contain
+
+Each cell of `tallies_wide.<rank>.csv` is the sum of the DADA2 counts
+(`sv/dada2.specimen.sv.long.csv`) of the sequence variants that
+`classify/sv_taxonomy.csv` labels with that taxon at `want_rank = <rank>`. Every variant
+carries exactly one label per rank, so each read is counted once at each rank, and every
+specimen total equals its DADA2 total. Where the classifier could not separate taxa, the
+label is a compound name with several `tax_id` (for example
+`Bifidobacterium/Fusobacterium`, `tax_id` `"1678,848"`), and the `rank` column can name
+a rank above the one in the file name. The compound `tax_id` is quoted, so the files
+need a CSV reader that honours quotes.
+
+[`scripts/check_tallies.R`](../scripts/check_tallies.R) rebuilds every table from those two
+files; its output is [`results/tallies_check/check_tallies.log`](../results/tallies_check/check_tallies.log).
+On 2026-10-19, with all 20 input files matching the output manifest, it found:
+
+| Rank | Cells | Cells differing from the DADA2 sum | Reads in the table |
+|---|---|---|---|
+| phylum | 9,657 | 0 | 28,277,142 |
+| class | 15,318 | 0 | 28,277,142 |
+| order | 23,754 | 0 | 28,277,142 |
+| family | 35,520 | 0 | 28,277,142 |
+| genus | 60,717 | 0 | 28,277,142 |
+| species | 101,343 | 0 | 28,277,142 |
+
+All cells are non-negative integers, and in each table the totals of all 111 specimens
+equal their DADA2 totals. An independent implementation (a PowerShell script, not
+versioned) gave the same zero differences and totals at all six ranks. Altering one cell
+of a copy of `tallies_wide.genus.csv` makes the R script fail on that cell, on that
+specimen's total and on the matching `by_specimen` row.
+
+The same script checks the long-form tables against the rebuilt matrix, at every rank:
+
+- `by_specimen.<rank>.csv` has one row per non-zero cell; `tally` is that cell,
+  `placements` is the number of sequence variants with reads behind it, and `freq` is
+  `tally` divided by the specimen's DADA2 total.
+- `by_taxon.<rank>.csv` has one row per taxon; `tally` and `placements` are the sums of
+  the `by_specimen` columns, and `avg_tally`, `avg_placements` and `avg_freq` are the sums
+  of `tally`, `placements` and `freq` divided by 111.
+
+What the script does **not** check: whether each variant's label is the right one. It
+takes `classify/sv_taxonomy.csv` as given; that file comes from the placements and the
+`hybrid2` classifier, and its labels are evaluated against QIIME2 only at genus level, in
+[`CONCORDANCE_QIIME2_MALIAMPI.md`](CONCORDANCE_QIIME2_MALIAMPI.md).
+
+Until 2026-10-19 this section stated that these matrices held placement weights, with
+specimen totals that could exceed the DADA2 counts, and that the species table had an
+unnamed extra column. None of the files has either property; the check above replaces
+that description.
 
 Counts from the denoising stage, read directly from the outputs:
 
@@ -256,6 +298,12 @@ Rscript scripts/describe_refpkg.R /path/to/refpkg.tar.gz
 # 2. Are the outputs the ones this record describes?
 MALIAMPI_OUT=/path/to/salida_analisis bash scripts/make_output_manifest.sh
 git diff --stat metadata/maliampi_outputs_manifest.csv   # must come back empty
+```
+
+```bash
+# 3. Are the taxonomic tables the DADA2 counts, one label per variant? (§6)
+Rscript scripts/check_tallies.R /path/to/salida_analisis > check_tallies.log
+diff --strip-trailing-cr check_tallies.log results/tallies_check/check_tallies.log   # must come back empty
 ```
 
 To launch the pipeline again from reads, edit the paths at the top of

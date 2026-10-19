@@ -1,0 +1,196 @@
+check_tallies.R
+R 4.4.2, readr 2.1.5
+
+1. Inputs against metadata/maliampi_outputs_manifest.csv
+  a06c7a sv/dada2.specimen.sv.long.csv                       OK
+  9750d5 classify/sv_taxonomy.csv                            OK
+  da1e51 classify/tables/tallies_wide.phylum.csv             OK
+  625eca classify/tables/tallies_wide.class.csv              OK
+  f26c92 classify/tables/tallies_wide.order.csv              OK
+  fea74b classify/tables/tallies_wide.family.csv             OK
+  2c7d20 classify/tables/tallies_wide.genus.csv              OK
+  61c030 classify/tables/tallies_wide.species.csv            OK
+  76b198 classify/tables/by_specimen.phylum.csv              OK
+  b90fa5 classify/tables/by_specimen.class.csv               OK
+  94438f classify/tables/by_specimen.order.csv               OK
+  4b82b6 classify/tables/by_specimen.family.csv              OK
+  4c72ec classify/tables/by_specimen.genus.csv               OK
+  8c5c0e classify/tables/by_specimen.species.csv             OK
+  4c5168 classify/tables/by_taxon.phylum.csv                 OK
+  ba6a69 classify/tables/by_taxon.class.csv                  OK
+  fa2c4e classify/tables/by_taxon.order.csv                  OK
+  23137c classify/tables/by_taxon.family.csv                 OK
+  754150 classify/tables/by_taxon.genus.csv                  OK
+  b6527a classify/tables/by_taxon.species.csv                OK
+
+2. DADA2 long table
+  every count is a non-negative integer                      OK
+  no duplicated (specimen, sv) pair                          OK
+  rows: 177,503; distinct SVs: 21,382; specimens: 111; reads: 28,277,142
+
+3. Rank: phylum
+  each SV has at most one row at this want_rank              OK
+  each tax_name has a single tax_id and rank                 OK
+  SVs labelled: 21,382; long rows without a label: 0 (0 reads)
+  header: tax_name, tax_id, rank, then specimens             OK
+  every column has a non-empty, unique name                  OK
+  specimen columns == DADA2 specimens                        OK
+  one row per tax_name                                       OK
+  tax_id and rank equal those in sv_taxonomy                 OK
+  every cell is a non-negative integer                       OK
+  cells equal to the DADA2 sum (9,657 cells, 0 differ)       OK
+  no labelled reads left out of the table (0 combos)         OK
+  specimen totals equal DADA2 (0 of 111 differ)              OK
+  by_specimen: header specimen, tax_name, tax_id, rank, tally, placements, freq OK
+  by_specimen: rows == non-zero cells (2,078)                OK
+  by_specimen: tally == tallies_wide cell                    OK
+  by_specimen: placements == SVs with reads                  OK
+  by_specimen: freq == tally / specimen total (|diff| < 1e-12) OK
+  by_taxon: header tax_id, tax_name, rank, tally, placements, avg_* OK
+  by_taxon: one row per taxon present (87)                   OK
+  by_taxon: tally == sum of by_specimen tally                OK
+  by_taxon: placements == sum of by_specimen placements      OK
+  by_taxon: avg_tally == tally / specimens                   OK
+  by_taxon: avg_placements == placements / specimens         OK
+  by_taxon: avg_freq == sum of freq / specimens              OK
+
+3. Rank: class
+  each SV has at most one row at this want_rank              OK
+  each tax_name has a single tax_id and rank                 OK
+  SVs labelled: 21,382; long rows without a label: 0 (0 reads)
+  header: tax_name, tax_id, rank, then specimens             OK
+  every column has a non-empty, unique name                  OK
+  specimen columns == DADA2 specimens                        OK
+  one row per tax_name                                       OK
+  tax_id and rank equal those in sv_taxonomy                 OK
+  every cell is a non-negative integer                       OK
+  cells equal to the DADA2 sum (15,318 cells, 0 differ)      OK
+  no labelled reads left out of the table (0 combos)         OK
+  specimen totals equal DADA2 (0 of 111 differ)              OK
+  by_specimen: header specimen, tax_name, tax_id, rank, tally, placements, freq OK
+  by_specimen: rows == non-zero cells (2,868)                OK
+  by_specimen: tally == tallies_wide cell                    OK
+  by_specimen: placements == SVs with reads                  OK
+  by_specimen: freq == tally / specimen total (|diff| < 1e-12) OK
+  by_taxon: header tax_id, tax_name, rank, tally, placements, avg_* OK
+  by_taxon: one row per taxon present (138)                  OK
+  by_taxon: tally == sum of by_specimen tally                OK
+  by_taxon: placements == sum of by_specimen placements      OK
+  by_taxon: avg_tally == tally / specimens                   OK
+  by_taxon: avg_placements == placements / specimens         OK
+  by_taxon: avg_freq == sum of freq / specimens              OK
+
+3. Rank: order
+  each SV has at most one row at this want_rank              OK
+  each tax_name has a single tax_id and rank                 OK
+  SVs labelled: 21,382; long rows without a label: 0 (0 reads)
+  header: tax_name, tax_id, rank, then specimens             OK
+  every column has a non-empty, unique name                  OK
+  specimen columns == DADA2 specimens                        OK
+  one row per tax_name                                       OK
+  tax_id and rank equal those in sv_taxonomy                 OK
+  every cell is a non-negative integer                       OK
+  cells equal to the DADA2 sum (23,754 cells, 0 differ)      OK
+  no labelled reads left out of the table (0 combos)         OK
+  specimen totals equal DADA2 (0 of 111 differ)              OK
+  by_specimen: header specimen, tax_name, tax_id, rank, tally, placements, freq OK
+  by_specimen: rows == non-zero cells (3,763)                OK
+  by_specimen: tally == tallies_wide cell                    OK
+  by_specimen: placements == SVs with reads                  OK
+  by_specimen: freq == tally / specimen total (|diff| < 1e-12) OK
+  by_taxon: header tax_id, tax_name, rank, tally, placements, avg_* OK
+  by_taxon: one row per taxon present (214)                  OK
+  by_taxon: tally == sum of by_specimen tally                OK
+  by_taxon: placements == sum of by_specimen placements      OK
+  by_taxon: avg_tally == tally / specimens                   OK
+  by_taxon: avg_placements == placements / specimens         OK
+  by_taxon: avg_freq == sum of freq / specimens              OK
+
+3. Rank: family
+  each SV has at most one row at this want_rank              OK
+  each tax_name has a single tax_id and rank                 OK
+  SVs labelled: 21,382; long rows without a label: 0 (0 reads)
+  header: tax_name, tax_id, rank, then specimens             OK
+  every column has a non-empty, unique name                  OK
+  specimen columns == DADA2 specimens                        OK
+  one row per tax_name                                       OK
+  tax_id and rank equal those in sv_taxonomy                 OK
+  every cell is a non-negative integer                       OK
+  cells equal to the DADA2 sum (35,520 cells, 0 differ)      OK
+  no labelled reads left out of the table (0 combos)         OK
+  specimen totals equal DADA2 (0 of 111 differ)              OK
+  by_specimen: header specimen, tax_name, tax_id, rank, tally, placements, freq OK
+  by_specimen: rows == non-zero cells (5,006)                OK
+  by_specimen: tally == tallies_wide cell                    OK
+  by_specimen: placements == SVs with reads                  OK
+  by_specimen: freq == tally / specimen total (|diff| < 1e-12) OK
+  by_taxon: header tax_id, tax_name, rank, tally, placements, avg_* OK
+  by_taxon: one row per taxon present (320)                  OK
+  by_taxon: tally == sum of by_specimen tally                OK
+  by_taxon: placements == sum of by_specimen placements      OK
+  by_taxon: avg_tally == tally / specimens                   OK
+  by_taxon: avg_placements == placements / specimens         OK
+  by_taxon: avg_freq == sum of freq / specimens              OK
+
+3. Rank: genus
+  each SV has at most one row at this want_rank              OK
+  each tax_name has a single tax_id and rank                 OK
+  SVs labelled: 21,382; long rows without a label: 0 (0 reads)
+  header: tax_name, tax_id, rank, then specimens             OK
+  every column has a non-empty, unique name                  OK
+  specimen columns == DADA2 specimens                        OK
+  one row per tax_name                                       OK
+  tax_id and rank equal those in sv_taxonomy                 OK
+  every cell is a non-negative integer                       OK
+  cells equal to the DADA2 sum (60,717 cells, 0 differ)      OK
+  no labelled reads left out of the table (0 combos)         OK
+  specimen totals equal DADA2 (0 of 111 differ)              OK
+  by_specimen: header specimen, tax_name, tax_id, rank, tally, placements, freq OK
+  by_specimen: rows == non-zero cells (6,063)                OK
+  by_specimen: tally == tallies_wide cell                    OK
+  by_specimen: placements == SVs with reads                  OK
+  by_specimen: freq == tally / specimen total (|diff| < 1e-12) OK
+  by_taxon: header tax_id, tax_name, rank, tally, placements, avg_* OK
+  by_taxon: one row per taxon present (547)                  OK
+  by_taxon: tally == sum of by_specimen tally                OK
+  by_taxon: placements == sum of by_specimen placements      OK
+  by_taxon: avg_tally == tally / specimens                   OK
+  by_taxon: avg_placements == placements / specimens         OK
+  by_taxon: avg_freq == sum of freq / specimens              OK
+
+3. Rank: species
+  each SV has at most one row at this want_rank              OK
+  each tax_name has a single tax_id and rank                 OK
+  SVs labelled: 21,382; long rows without a label: 0 (0 reads)
+  header: tax_name, tax_id, rank, then specimens             OK
+  every column has a non-empty, unique name                  OK
+  specimen columns == DADA2 specimens                        OK
+  one row per tax_name                                       OK
+  tax_id and rank equal those in sv_taxonomy                 OK
+  every cell is a non-negative integer                       OK
+  cells equal to the DADA2 sum (101,343 cells, 0 differ)     OK
+  no labelled reads left out of the table (0 combos)         OK
+  specimen totals equal DADA2 (0 of 111 differ)              OK
+  by_specimen: header specimen, tax_name, tax_id, rank, tally, placements, freq OK
+  by_specimen: rows == non-zero cells (8,850)                OK
+  by_specimen: tally == tallies_wide cell                    OK
+  by_specimen: placements == SVs with reads                  OK
+  by_specimen: freq == tally / specimen total (|diff| < 1e-12) OK
+  by_taxon: header tax_id, tax_name, rank, tally, placements, avg_* OK
+  by_taxon: one row per taxon present (913)                  OK
+  by_taxon: tally == sum of by_specimen tally                OK
+  by_taxon: placements == sum of by_specimen placements      OK
+  by_taxon: avg_tally == tally / specimens                   OK
+  by_taxon: avg_placements == placements / specimens         OK
+  by_taxon: avg_freq == sum of freq / specimens              OK
+
+4. Summary (DADA2 reads after chimera removal: 28,277,142)
+    rank taxa specimens   cells cells_differing total_reads unlabelled_reads
+  phylum   87       111   9,657               0  28,277,142                0
+   class  138       111  15,318               0  28,277,142                0
+   order  214       111  23,754               0  28,277,142                0
+  family  320       111  35,520               0  28,277,142                0
+   genus  547       111  60,717               0  28,277,142                0
+ species  913       111 101,343               0  28,277,142                0
+
+checks failed: 0
