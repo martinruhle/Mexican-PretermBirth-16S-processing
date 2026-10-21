@@ -147,7 +147,7 @@ not distribute them. Raw reads are in SRA under BioProject **PRJNA1440471**. See
 - **MaLiAmPi** — Golob JL. *MaLiAmPi: Maximum Likelihood Amplicon Pipeline.*
   <https://github.com/jgolob/maliampi>
 - **The Microbiome Preterm Birth DREAM Challenge** — Golob JL, Oskotsky TT, Tang AS,
-  et al. *Cell Reports Medicine* 2024;5(1):101359. The benchmark this project aims to
+  et al. *Cell Reports Medicine* 2024;5(1):101350. The benchmark this project aims to
   be comparable with.
 
 ## Citation
