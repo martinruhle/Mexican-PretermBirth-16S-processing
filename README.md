@@ -28,6 +28,7 @@ cleanly.
 | Whether MaLiAmPi and QIIME2 see the same microbiome | [`docs/CONCORDANCE_QIIME2_MALIAMPI.md`](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | What comes next and why it has not happened yet | [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
 | Why the reads of the Michigan cohort, a separate cohort for external validation, cannot go through the same pipeline | [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
+| Which other Latin American or Hispanic pregnancy cohorts exist, and which of them could be used | [`docs/EXTERNAL_COHORTS_LATAM.md`](docs/EXTERNAL_COHORTS_LATAM.md) |
 | What is still unresolved about this run | [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) |
 | Where the actual data is, since it is not here | [`docs/DATA_ACCESS.md`](docs/DATA_ACCESS.md) |
 | Which software versions are pinned, and which are not yet | [`env/VERSIONS.md`](env/VERSIONS.md) |
@@ -77,6 +78,7 @@ median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values 
 | **External validation on the Michigan cohort** — a different cohort, not more participants for this one | 🚧 planned, and its reads need a different route — [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
 | **Re-placement against the DREAM Challenge reference package** | 🚧 **not started** — [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
 | External validation against the DREAM hispanic subgroup | 🚧 blocked on the row above |
+| Inventory of other Latin American and Hispanic cohorts that could extend this one | ✅ searched and recorded (2026-10-21) — [`docs/EXTERNAL_COHORTS_LATAM.md`](docs/EXTERNAL_COHORTS_LATAM.md); fewer than three usable datasets are public, and the four closest ones need a request to their authors |
 
 Nothing in this repository is written as if a pending stage were done. Where a result
 was produced but cannot yet be re-run from here, it says so at the point where the
@@ -157,4 +159,4 @@ Licensed MIT — see [`LICENSE`](LICENSE).
 
 ---
 
-*Last updated 2026-10-15.*
+*Last updated 2026-10-21.*
