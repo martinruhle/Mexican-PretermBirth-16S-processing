@@ -68,17 +68,17 @@ Only `golob/taxtastic:0.9.5D` and the Infernal image appear in the surviving log
 is expected: the final session resumed from cache and ran ten processes. The rest come
 from the source at the pinned commit, which is what determines them.
 
-## 2. The downstream tooling — not yet pinned
+## 2. The downstream tooling — partly pinned
 
-The steps that come *after* MaLiAmPi are not containerised by the workflow and are the
-subject of a separate objective. They are not installed from a recorded environment
-today, which means the next stage is currently not reproducible on another machine.
+The steps that come *after* MaLiAmPi are not containerised by the workflow. VALENCIA and
+the Python that runs it are now pinned and install from a recorded environment (below).
+The phylotype binning and the R side are not yet installed from one.
 
 | Tool | Purpose | Version |
 |---|---|---|
-| VALENCIA | community state type assignment from species tables | **pending** |
+| VALENCIA | community state type assignment from species tables | ✅ **commit `8559d454387479f7155333693d854961463c3b15`** of `github.com/ravel-lab/VALENCIA` — see [VALENCIA](#valencia--pinned-by-its-commit-in-a-pip-virtual-environment) |
 | MaLiAmPi phylotype binning | phylotypes at 0.1 / 0.5 / 1.0 | **pending** |
-| Python (for the VALENCIA conversion scripts) | | **pending** |
+| Python (for VALENCIA and the conversion of our species table to its input) | | ✅ Python 3.10.12 (Ubuntu 22.04 package `python3.10` `3.10.12-1~22.04.18`), in a pip virtual environment; pandas 2.3.3, numpy 2.2.6, matplotlib 3.10.9 and their dependencies pinned in [`valencia-requirements.txt`](valencia-requirements.txt) |
 | R + packages for the concordance report | R 4.4.2; tidyverse 2.0.0, vegan 2.7.2, patchwork 1.3.2, ggrepel 0.9.6; for the reproducible report also readxl 1.4.5, here 1.0.2, digest 0.6.37, rmarkdown 2.30, knitr 1.51 | ✅ captured — [`results/concordance/as_run_2026-09-21/run_curation_on.log`](../results/concordance/as_run_2026-09-21/run_curation_on.log), and the full `sessionInfo()` at the end of [`analysis/concordance_qiime2_maliampi.html`](../analysis/concordance_qiime2_maliampi.html). Still needs pinning in the environment file, not just recording |
 
 The product that closes this gap is a conda environment file with exact pins, not
@@ -90,6 +90,73 @@ still placeholders.
 tool or a lockfile. None may be guessed, and none may be copied from documentation
 without checking the machine that actually ran the analysis.
 
+VALENCIA is the exception to the conda file: it never ran from conda, so its Python side
+is pinned as a pip requirements file instead (next section), and the conda file only
+points to it.
+
+### VALENCIA — pinned by its commit, in a pip virtual environment
+
+VALENCIA is not packaged on conda or PyPI; it is a script (`Valencia.py`) plus a
+reference centroids file in its own repository, so the only way to pin it is the commit.
+
+| | Value | Verified from |
+|---|---|---|
+| Repository | `https://github.com/ravel-lab/VALENCIA`, branch `master` | `git remote -v` in the clone that ran (`~/VALENCIA`, WSL), 2026-10-26 |
+| **Commit** | **`8559d454387479f7155333693d854961463c3b15`** (2023-04-18, "Merge pull request #10 from ravel-lab/add-license-1"); no local changes; the upstream `HEAD` on 2026-10-26 | `git log -1`, `git status` in that clone |
+| `Valencia.py` | sha256 `8714f524d2ee4c803c5cff5ef99719a776d8e5301b6ffd58f4cc06fba25fa478` | same clone, and a fresh clone at the commit |
+| `CST_centroids_012920.csv` | sha256 `9d18456724e439a1e828ff2dd34dd12e51cc08729ae025aaafabe05390093e96` | same |
+| Python | 3.10.12, the system `python3` of Ubuntu 22.04 (package `python3.10` `3.10.12-1~22.04.18` on 2026-10-28), not a conda Python | `pyvenv.cfg` of the venv that ran (`~/valencia_env`), `dpkg -l` |
+| Python packages | [`valencia-requirements.txt`](valencia-requirements.txt): exact pins read with `pip freeze` from `~/valencia_env` on 2026-10-28 | that venv was created on 2026-05-25 with an unpinned `pip install pandas numpy matplotlib` (shell history); the file records what that resolved to |
+
+`matplotlib` is only needed for VALENCIA's optional `-p` plot. The venv that ran also
+holds scipy 1.15.3, installed later for a downstream analysis script outside this
+repository; it is left out of the requirements because neither `Valencia.py` nor the
+conversion script imports it.
+
+**Why pandas must stay pinned.** At this commit `Valencia.py` reads the centroid
+medians by position with `Series[int]` (lines 54–55). pandas 2.3.3 still accepts that,
+with a `FutureWarning` ("Series.__getitem__ treating keys as positions is deprecated");
+the deprecation says integer keys will be read as labels in a future version. An
+unpinned install could therefore stop reproducing the assignments, or fail.
+
+#### Installing it
+
+On Ubuntu 22.04 (or WSL `Ubuntu-22.04`), with the system Python:
+
+```bash
+sudo apt install python3-venv                       # once, if `python3 -m venv` is missing
+git clone https://github.com/ravel-lab/VALENCIA.git
+git -C VALENCIA checkout 8559d454387479f7155333693d854961463c3b15
+python3 -m venv valencia_env
+valencia_env/bin/pip install -r env/valencia-requirements.txt   # path into this repository
+valencia_env/bin/python VALENCIA/Valencia.py \
+  -ref VALENCIA/CST_centroids_012920.csv -i <input>.csv -o <output_prefix> [-p <plot_prefix>]
+```
+
+The reference file is `CST_centroids_012920.csv`; the VALENCIA README calls it
+`CST_profiles_012920.csv`, a name that does not exist in the repository. `-o` and `-p`
+are prefixes: the output is written to `<output_prefix>.csv`.
+
+#### Checked from scratch
+
+[`scripts/check_valencia_install.sh`](../scripts/check_valencia_install.sh) does exactly
+the steps above in a new temporary directory (fresh clone, fresh venv, the pip 22.0.2
+that Ubuntu's venv ships) and compares the result with the files of 2026-05-25, without
+touching the clone or the venv that produced them. Its output, run on 2026-10-28, is in
+[`results/valencia_install_check/check_valencia_install.log`](../results/valencia_install_check/check_valencia_install.log):
+
+- `pip freeze` of the new venv equals the 14 pins of the requirements file;
+- `Valencia.py` and the centroids of the new clone have the same sha256 as those of the
+  clone that ran;
+- on the input of 2026-05-25 (sha256 `7388b531…`), the new install writes an output with
+  sha256 `0805b305c0bb8a85bb371794c9a23213872b65d14ebc196f4b427f23c26fac42`,
+  byte-identical to the output of 2026-05-25;
+- regenerating that input with an unmodified copy of the conversion script of
+  2026-05-25 gives the same input and the same output, byte for byte.
+
+Both files hold per-specimen abundances and are not in this repository; only their
+hashes are.
+
 ---
 
-*Last updated 2026-09-24.*
+*Last updated 2026-10-28.*

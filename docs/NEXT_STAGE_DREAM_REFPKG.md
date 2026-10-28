@@ -238,7 +238,7 @@ repositories; the Docker images were not inspected).
    labels, compound labels included, have to be mapped onto them, in the form each model
    expects: relative abundance (IBB_UT, KBJ) or read counts with CLR (UWisc-Madison, CompD).
 2. **CST on our species table.** VALENCIA has not been run on our MaLiAmPi tables in this
-   repository ([`env/VERSIONS.md`](../env/VERSIONS.md) lists it as pending). Every model in the
+   repository (its commit and environment are pinned in [`env/VERSIONS.md`](../env/VERSIONS.md)). Every model in the
    table uses CST except DMIS_2022_PTB (not among its listed inputs) and the organizers'
    examples; for @polalawang it is *not verified*.
 3. **The collection window.** SC1 models were scored on specimens up to week 32 and SC2 models

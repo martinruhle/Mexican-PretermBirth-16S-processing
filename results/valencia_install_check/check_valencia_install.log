@@ -1,0 +1,34 @@
+tmp: /tmp/valencia_fresh.gWYODs
+2026-10-28T16:57:39-03:00
+== clone
+8559d454387479f7155333693d854961463c3b15
+local changes: 0
+== venv
+Python 3.10.12
+pip 22.0.2 from /tmp/valencia_fresh.gWYODs/venv/lib/python3.10/site-packages/pip (python 3.10)
+pip freeze of the new venv == pins in valencia-requirements.txt (14 packages)
+== VALENCIA files: new clone vs the clone that ran
+8714f524d2ee4c803c5cff5ef99719a776d8e5301b6ffd58f4cc06fba25fa478  VALENCIA/Valencia.py
+9d18456724e439a1e828ff2dd34dd12e51cc08729ae025aaafabe05390093e96  VALENCIA/CST_centroids_012920.csv
+8714f524d2ee4c803c5cff5ef99719a776d8e5301b6ffd58f4cc06fba25fa478  /home/martinruhle/VALENCIA/Valencia.py
+9d18456724e439a1e828ff2dd34dd12e51cc08729ae025aaafabe05390093e96  /home/martinruhle/VALENCIA/CST_centroids_012920.csv
+== A: VALENCIA on the input of 2026-05-25
+pandas FutureWarnings: 28
+FutureWarning: Series.__getitem__ treating keys as positions is deprecated
+7388b53155aaae6af91be887ed3bdcab7477c2ce78cf1ad3dedf305325d9d082  /home/martinruhle/valencia_input_maliampi.csv
+0805b305c0bb8a85bb371794c9a23213872b65d14ebc196f4b427f23c26fac42  out_A.csv
+0805b305c0bb8a85bb371794c9a23213872b65d14ebc196f4b427f23c26fac42  /home/martinruhle/valencia_output_maliampi.csv
+A: output byte-identical to 2026-05-25
+== B: converter of 2026-05-25 (unmodified copy) -> VALENCIA
+9c39f7a163476070767314a4f135181121a912ed7303953d87749a66622a609a  convert_maliampi_to_valencia.py
+pandas 2.3.3, numpy 2.2.6
+7388b53155aaae6af91be887ed3bdcab7477c2ce78cf1ad3dedf305325d9d082  home/valencia_input_maliampi.csv
+0805b305c0bb8a85bb371794c9a23213872b65d14ebc196f4b427f23c26fac42  out_B.csv
+B: input byte-identical to 2026-05-25
+B: output byte-identical to 2026-05-25
+== originals untouched
+8559d454387479f7155333693d854961463c3b15
+2026-05-25 11:53:16.084647364 /home/martinruhle/valencia_env/pyvenv.cfg
+2026-05-25 12:04:36.621788299 /home/martinruhle/valencia_input_maliampi.csv
+2026-05-25 12:08:21.387398366 /home/martinruhle/valencia_output_maliampi.csv
+2026-10-28T16:58:09-03:00

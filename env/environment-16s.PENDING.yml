@@ -28,12 +28,20 @@ dependencies:
   - pplacer=x.y.z             # PENDING: read from the container the workflow uses
   - taxtastic=0.9.5D          # VERIFIED: container tag golob/taxtastic:0.9.5D
   # --- community state types ------------------------------------------------
-  - python=x.y.z              # PENDING
-  - pandas=x.y.z              # PENDING - required by VALENCIA
-  - numpy=x.y.z               # PENDING - required by VALENCIA
-  # VALENCIA is not on conda; it is a script obtained from its own repository.
-  # Record its commit hash here once fixed:
-  #   VALENCIA commit: PENDING
+  # Not part of this conda environment. VALENCIA ran from a pip virtual
+  # environment on the system Python (3.10.12, Ubuntu 22.04), not from conda,
+  # so its pins live in a pip requirements file rather than here:
+  #   VALENCIA commit: 8559d454387479f7155333693d854961463c3b15
+  #                    (github.com/ravel-lab/VALENCIA, branch master)
+  #   Python packages: env/valencia-requirements.txt (pandas 2.3.3,
+  #                    numpy 2.2.6, matplotlib 3.10.9 and their dependencies)
+  # Install:
+  #   git clone https://github.com/ravel-lab/VALENCIA.git
+  #   git -C VALENCIA checkout 8559d454387479f7155333693d854961463c3b15
+  #   python3 -m venv valencia_env
+  #   valencia_env/bin/pip install -r env/valencia-requirements.txt
+  # Checked from scratch on 2026-10-28 (scripts/check_valencia_install.sh);
+  # details in env/VERSIONS.md, section "VALENCIA".
   # --- R side (concordance report) -----------------------------------------
   - r-base=x.y.z              # PENDING
   - r-tidyverse=x.y.z         # PENDING
