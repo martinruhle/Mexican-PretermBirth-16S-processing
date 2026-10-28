@@ -18,6 +18,7 @@ the as-run copy stays untouched.
 | `verify_sample_pairing_2026-09-21.R` | 2026-09-21 | `pairing_verification.log` in the same directory: the specimen-by-specimen check of v2's input — 106 rows hold their own specimen's counts, 4 (Au52, Au197, Au179, Au203) hold their pair partner's |
 | `gate_qiime2_maliampi_v2.R` | 2026-05-22 | [`results/concordance/as_run_2026-05-22/`](../results/concordance/as_run_2026-05-22/) — superseded by v3, which re-anchors those 4 of the 110 specimens |
 | `gate_qiime2_maliampi_v1.R` | earlier | superseded by v2; kept for history |
+| `convert_maliampi_to_valencia_2026-05-25.py` | 2026-05-25 | the VALENCIA input (SHA-256 `7388b531…`) from `tallies_wide.species.csv`; run unchanged by [`scripts/run_valencia_cst.sh`](../scripts/run_valencia_cst.sh), which reproduces it byte for byte — [`docs/CST_VALENCIA.md`](../docs/CST_VALENCIA.md) |
 
 v3 is v2 plus one block (4a) and nothing else, so `diff v2 v3` shows the entire change.
 

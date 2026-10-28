@@ -1,0 +1,84 @@
+2026-10-28T17:45:16-03:00
+== checks
+VALENCIA clone at 8559d454387479f7155333693d854961463c3b15
+VALENCIA clone has no local changes
+converter == as-run file (sha256 9c39f7a1)
+species table == manifest (sha256 61c030dc)
+Python 3.10.12
+== converter (its own report lists specimens, so it stays in the temporary directory)
+pandas 2.3.3, numpy 2.2.6
+== VALENCIA
+done; pandas FutureWarnings: 28
+== summary
+pandas 2.3.3, numpy 2.2.6
+
+== Files (sha256)
+species table    61c030dcf461c5263f4e8a75b0a6164f9aa9d1dc85a6642f644676f43216c1c4  tallies_wide.species.csv
+VALENCIA input   7388b53155aaae6af91be887ed3bdcab7477c2ce78cf1ad3dedf305325d9d082  valencia_input_maliampi.csv
+VALENCIA output  0805b305c0bb8a85bb371794c9a23213872b65d14ebc196f4b427f23c26fac42  valencia_output_maliampi.csv
+centroids        9d18456724e439a1e828ff2dd34dd12e51cc08729ae025aaafabe05390093e96  CST_centroids_012920.csv
+compared output  0805b305c0bb8a85bb371794c9a23213872b65d14ebc196f4b427f23c26fac42  valencia_output_maliampi.csv
+
+== Specimens
+species table: 111 specimens, 913 taxa rows
+VALENCIA input: 111 specimens, 409 taxa columns
+VALENCIA output: 111 specimens
+input holds every read of the species table; read_count == row total for every specimen
+
+== Conversion: where the reads go (fraction of all reads in the cohort)
+rank 'species' in the MaLiAmPi table: 89.47 %
+superkingdom-level ranks (kept in read_count, no centroid column): 5.72 %
+all ranks above family together (unclassified_*): 6.82 %
+g_Lactobacillus column: 1.12 %, from 21 Lactobacillus labels (genus level, compounds, and species other than crispatus, iners, gasseri, jensenii)
+  of which species with a column of their own in the centroids: Lactobacillus pontis, Lactobacillus equicursoris, Lactobacillus delbrueckii, Lactobacillus coleohominis, Lactobacillus reuteri (0.24 %)
+Gardnerella at genus level, written as Gardnerella_vaginalis: 0.01 %
+
+== Coverage by the reference centroids
+taxa columns with a centroid column: 108 of 409
+reads in those columns: 86.73 %
+per specimen: median 95.04 %, min 37.41 %, max 99.74 %
+specimens below 80 %: 18
+largest columns without a centroid column:
+  unclassified_superkingdom      5.13 %
+  g_Gordonia                     2.07 %
+  g_Hydrotalea                   1.54 %
+  unclassified_superkingdom_     0.58 %
+  unclassified_order             0.55 %
+  g_Mesorhizobium                0.45 %
+  f_Clostridiales                0.45 %
+  g_Agrobacterium                0.38 %
+
+== Assignment
+ CST  n  n_similarity_below_0.5
+   I 57                      11
+  II  1                       0
+ III 23                       2
+IV-A  0                       0
+IV-B 28                       5
+IV-C  1                       0
+   V  1                       0
+
+subCST  n  n_similarity_below_0.5
+   I-A  5                       0
+   I-B 52                      11
+    II  1                       0
+ III-A  6                       0
+ III-B 17                       2
+  IV-A  0                       0
+  IV-B 28                       5
+ IV-C0  0                       0
+ IV-C1  0                       0
+ IV-C2  0                       0
+ IV-C3  1                       0
+ IV-C4  0                       0
+     V  1                       0
+
+similarity to the assigned subCST: median 0.737, min 0.072; below 0.5: 18 specimens
+specimens below 0.5 similarity and below 80 % coverage: 8
+
+== Compared with valencia_output_maliampi.csv
+specimens in both: 111; same subCST: 111; different: 0
+byte-identical files: True
+
+wrote cst_counts.csv and subcst_counts.csv to results/valencia_cst
+2026-10-28T17:45:25-03:00

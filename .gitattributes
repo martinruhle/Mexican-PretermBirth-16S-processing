@@ -5,3 +5,8 @@ results/**/*.csv text eol=lf
 results/**/*.txt text eol=lf
 results/**/*.md  text eol=lf
 results/**/*.log text eol=lf
+
+# scripts/run_valencia_cst.sh checks the as-run converter against its SHA-256.
+# The file ran with CRLF line endings (it was written on Windows): store and
+# check it out byte for byte, with no line-ending conversion.
+analysis/as_run/*.py -text

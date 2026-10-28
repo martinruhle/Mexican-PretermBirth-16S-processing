@@ -5,7 +5,7 @@ data; all of them are regenerable by the scripts named below.
 
 | File | What it is | Regenerate with |
 |---|---|---|
-| `maliampi_outputs_manifest.csv` | every file the MaLiAmPi run produced, with size and SHA-256 (41 files, ~1.3 GB of data described in 4 KB); then the files every join to the cohort depends on (rows under `metadata/`) | `MALIAMPI_OUT=<dir> bash scripts/make_output_manifest.sh` |
+| `maliampi_outputs_manifest.csv` | every file the MaLiAmPi run produced, with size and SHA-256 (41 files, ~1.3 GB of data described in 4 KB); then the files every join to the cohort depends on (rows under `metadata/`); then the VALENCIA input and output computed from the species table (rows under `valencia/`) | `MALIAMPI_OUT=<dir> [VALENCIA_DIR=<dir>] bash scripts/make_output_manifest.sh` |
 | `refpkg_CONTENTS.json` | the taxtastic manifest of the reference package: build date, file roles, per-file MD5 sums, and the build log | copied from inside `refpkg.tar.gz` |
 | `refpkg_RAxML_info.txt` | RAxML run information for the reference phylogeny: version, model, command line, likelihoods | copied from inside `refpkg.tar.gz` |
 | `refpkg_description.txt` | the summary numbers quoted in `docs/REFPKG_PROVENANCE.md` | `Rscript scripts/describe_refpkg.R <refpkg.tar.gz>` |
@@ -26,6 +26,12 @@ Rows whose path starts with `metadata/` are relative to the repository root, not
 `MALIAMPI_OUT`. If the map is present, `make_output_manifest.sh` re-hashes it. If it is
 absent, the recorded row is carried over with a warning, so regenerating the manifest
 without the map does not silently drop it.
+
+Rows whose path starts with `valencia/` are the VALENCIA input and output of 2026-05-25
+([`docs/CST_VALENCIA.md`](../docs/CST_VALENCIA.md)). They hold per-specimen abundances
+and are not versioned either. The path is relative to `VALENCIA_DIR`, the directory that
+holds them (the home directory of the machine that ran it). They are carried over the
+same way when `VALENCIA_DIR` is not set.
 
 ## Why manifests instead of data
 

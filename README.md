@@ -26,6 +26,7 @@ cleanly.
 | Which reference package our placements were made against, and how we know | [`docs/REFPKG_PROVENANCE.md`](docs/REFPKG_PROVENANCE.md) |
 | What exactly was run, on what, with what, and what it produced | [`docs/RUN_MALIAMPI.md`](docs/RUN_MALIAMPI.md) |
 | Whether MaLiAmPi and QIIME2 see the same microbiome | [`docs/CONCORDANCE_QIIME2_MALIAMPI.md`](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
+| How many specimens fall in each VALENCIA community state type, and how our species table was converted for VALENCIA | [`docs/CST_VALENCIA.md`](docs/CST_VALENCIA.md) |
 | What comes next and why it has not happened yet | [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |
 | Why the reads of the Michigan cohort, a separate cohort for external validation, cannot go through the same pipeline | [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
 | Which other Latin American or Hispanic pregnancy cohorts exist, and which of them could be used | [`docs/EXTERNAL_COHORTS_LATAM.md`](docs/EXTERNAL_COHORTS_LATAM.md) |
@@ -73,7 +74,8 @@ median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values 
 | Provenance of the reference package | ✅ established |
 | Specimen ↔ participant linkage | ✅ one canonical map, identified by SHA-256; every MaLiAmPi ↔ QIIME2 pairing verified (2026-09-21) — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §6](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | QIIME2 ↔ MaLiAmPi concordance | ✅ reproducible from this repository (2026-10-01): [`analysis/concordance_qiime2_maliampi.Rmd`](analysis/concordance_qiime2_maliampi.Rmd) returns the archived numbers and tables from three hash-checked inputs — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
-| Software environment for the downstream tooling | ⚠️ partially pinned — [`env/VERSIONS.md`](env/VERSIONS.md) |
+| Community state types (VALENCIA) | ✅ assigned (2026-05-25) and re-run from this repository byte for byte (2026-10-28): I 57, III 23, IV-B 28, II 1, IV-C 1, V 1 — [`docs/CST_VALENCIA.md`](docs/CST_VALENCIA.md) |
+| Software environment for the downstream tooling | ⚠️ partially pinned: VALENCIA and its Python pinned (2026-10-28) — [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Phylotype binning (0.1 / 0.5 / 1.0) | 🚧 not started |
 | **External validation on the Michigan cohort** — a different cohort, not more participants for this one | 🚧 planned, and its reads need a different route — [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
 | **Re-placement against the DREAM Challenge reference package** | 🚧 **not started** — [`docs/NEXT_STAGE_DREAM_REFPKG.md`](docs/NEXT_STAGE_DREAM_REFPKG.md) |

@@ -19,6 +19,13 @@
 # are git-ignored (clinical metadata); only their hash is versioned. If one is
 # absent locally, its recorded row is carried over unchanged, with a warning:
 # it is then listed but NOT verified.
+#
+# Last come VALENCIA_FILES: the VALENCIA input and output computed from
+# classify/tables/tallies_wide.species.csv (docs/CST_VALENCIA.md). They hold
+# per-specimen abundances and are not versioned; they are listed as
+# valencia/<name> and hashed from VALENCIA_DIR, the directory that holds them.
+# If VALENCIA_DIR is unset or a file is missing, the recorded row is carried
+# over with the same warning as above.
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
@@ -29,9 +36,13 @@ DEST="$REPO_ROOT/metadata/maliampi_outputs_manifest.csv"
 # Canonical specimen (Au###) <-> participant map; see docs/CONCORDANCE_QIIME2_MALIAMPI.md §6.
 LINKED_FILES=(metadata/mapa_muestras_2026-09-20.csv)
 
+# VALENCIA input and output of 2026-05-25; see docs/CST_VALENCIA.md.
+VALENCIA_FILES=(valencia_input_maliampi.csv valencia_output_maliampi.csv)
+VALENCIA_DIR="${VALENCIA_DIR:-}"
+
 [ -d "$OUT_DIR" ] || { echo "not a directory: $OUT_DIR" >&2; exit 1; }
 
-PREV_LINKED="$(grep '^metadata/' "$DEST" 2>/dev/null || true)"
+PREV_LINKED="$(grep -E '^(metadata|valencia)/' "$DEST" 2>/dev/null || true)"
 
 echo "relative_path,bytes,sha256" > "$DEST"
 
@@ -53,6 +64,19 @@ for rel in "${LINKED_FILES[@]}"; do
   else
     row="$(printf '%s\n' "$PREV_LINKED" | grep "^$rel," || true)"
     [ -n "$row" ] || { echo "no local copy and no recorded row for $rel" >&2; exit 1; }
+    printf '%s\n' "$row" >> "$DEST"
+    echo "warning: $rel is not present locally; its recorded row was carried over, NOT verified" >&2
+  fi
+done
+
+for name in "${VALENCIA_FILES[@]}"; do
+  rel="valencia/$name"
+  f="$VALENCIA_DIR/$name"
+  if [ -n "$VALENCIA_DIR" ] && [ -f "$f" ]; then
+    printf '%s,%s,%s\n' "$rel" "$(stat -c %s "$f")" "$(sha256sum "$f" | cut -d' ' -f1)" >> "$DEST"
+  else
+    row="$(printf '%s\n' "$PREV_LINKED" | grep "^$rel," || true)"
+    [ -n "$row" ] || { echo "no file under VALENCIA_DIR and no recorded row for $rel" >&2; exit 1; }
     printf '%s\n' "$row" >> "$DEST"
     echo "warning: $rel is not present locally; its recorded row was carried over, NOT verified" >&2
   fi
