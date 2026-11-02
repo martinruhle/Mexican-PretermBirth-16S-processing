@@ -114,7 +114,7 @@ repository; it is left out of the requirements because neither `Valencia.py` nor
 conversion script imports it.
 
 **Why pandas must stay pinned.** At this commit `Valencia.py` reads the centroid
-medians by position with `Series[int]` (lines 54–55). pandas 2.3.3 still accepts that,
+medians by position with `Series[int]` (lines 53 and 55). pandas 2.3.3 still accepts that,
 with a `FutureWarning` ("Series.__getitem__ treating keys as positions is deprecated");
 the deprecation says integer keys will be read as labels in a future version. An
 unpinned install could therefore stop reproducing the assignments, or fail.
