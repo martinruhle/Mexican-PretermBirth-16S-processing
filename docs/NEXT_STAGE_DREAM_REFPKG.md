@@ -333,9 +333,12 @@ anything themselves. Two facts from these files bear on both options in §3:
   reach the training set without raw reads, but not the validation set, which is where
   every participant with a recorded ethnicity is.
 
-Ethnicity, by source. The current `metadata.csv` has no ethnicity column, so ImmPort's
-subject table (DR61) is the only current source: 38 "Hispanic or Latino", 95 "Not Hispanic
-or Latino" and 1 "Not Specified" among the 134 validation participants. The fourth study
+Ethnicity, by source. The current `metadata.csv` has no ethnicity column. There are two
+current sources: ImmPort's subject table (DR61), with 38 "Hispanic or Latino", 95 "Not
+Hispanic or Latino" and 1 "Not Specified" among the 134 validation participants, and the
+current `Validation.zip`'s own `metadata_normalized.csv`, whose ethnicity indicator columns
+agree with the subject table on 302 of 302 specimens (checked 2026-11-02; the files and the
+check are recorded in [`DATA_ACCESS.md`](DATA_ACCESS.md#where-ethnicity-comes-from)). The fourth study
 file, `IDmapping_participantID_ImmPortSUBacc.txt`, links all 134 to their rows in the
 current `Validation.zip`; 37 of the 38 belong to one of its two datasets. The earlier
 `metadata.csv` agrees with the subject table on all 134 participants the two share; its 42
@@ -456,5 +459,6 @@ A colleague should be able to confirm, without asking anyone:
 | ImmPort SDY2187, its data dictionary and the study archives added to §3b; request to the authors and size of the Hispanic subgroup recorded | 2026-10-12 |
 | Direction decided in §3: Option B the main line, Option A a separate line conditional on the authors' reply; reminder to the authors recorded | 2026-10-15 |
 | The Challenge's winning models in §3: inputs, tree dependence, code, fitted models, licences, training data and validation scores under both rankings; Option A kept | 2026-10-21 |
+| §3b: `metadata_normalized.csv` named as the second current source of ethnicity | 2026-11-02 |
 | Status | not started; precondition 1 settled (§3); the Option A line is blocked on precondition 2 |
 | Reviewed by | *pending* |
