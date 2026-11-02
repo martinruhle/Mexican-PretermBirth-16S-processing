@@ -1,0 +1,260 @@
+2026-11-02T18:37:51-03:00
+== checks
+VALENCIA clone at 8559d454387479f7155333693d854961463c3b15
+VALENCIA clone has no local changes
+converter == as-run file (sha256 9c39f7a163476070767314a4f135181121a912ed7303953d87749a66622a609a)
+Validation.zip == DR61 manifest (MD5 ce12eec5a51d4cf7db67dfebc9850b88, 3231727 bytes)
+Python 3.10.12
+== species table from sp_sv_long.csv and sv_taxonomy.csv
+pandas 2.3.3
+
+== sp_sv_long.csv
+(specimen, variant) pairs on more than one row: 281, in 25 specimens; their rows are added
+18401 rows, 2092 variants, 302 specimens, 22985909 reads; nreads sum to total_reads in every specimen
+specimens by project: K 159, V 143
+
+== sv_taxonomy.csv, want_rank == species
+2724 rows; 365 with an empty sv, left out
+2359 variants classified; every variant in sp_sv_long.csv is among them
+
+== Table built: 521 rows (tax_name, tax_id, rank), 302 specimens, 521 distinct tax_name
+rows by rank: class 3, class_ 1, family 32, family_ 3, genus 112, order 13, order_ 3, phylum 5, species 344, species_group 2, superkingdom 1, superkingdom_ 1, superkingdom__ 1
+
+== Checks
+summed by tax_name, equal cell by cell to taxonomy_nreads.species.full.csv (302 specimens x 521 labels)
+every specimen's column sums to its total_reads
+for reference, taxonomy_nreads.species.csv (not used) lacks 21 labels and 194303 reads of the .full table
+
+wrote tallies_wide.species.csv and specimen_project.csv (per-specimen, outside the repository)
+== converter (its own report lists specimens, so it stays in the temporary directory)
+pandas 2.3.3, numpy 2.2.6
+== VALENCIA
+done; pandas FutureWarnings: 28
+== kept outside the repository, in KEEP_DIR
+bc9ca38ef1c6f98f3826a286d619b5e6497be358f339573b5ce4dc43923ffd66  tallies_wide.species.dream_validation.csv
+b926a0ebfe89dcc8d7b8fb32fb9cd171b9a9722b9e7a553049f9144e7648a269  valencia_input_dream_validation.csv
+7f7a69b0ac7cb78a8146944b761649c8ece8ae45d8e79f7cb707ba625f5abcd0  valencia_output_dream_validation.csv
+513085b830f0460eeefa813ceba83636b835ef3b895915d09b45b56de0d550b8  specimen_project_dream_validation.csv
+== summary, whole set (compared with the Challenge's cst_valencia.csv, specimen -> sampleID)
+Challenge's cst_valencia.csv sha256 7fcd8bffadd56f30f60e60975fda5cb46ea08bacc9a3048b9390926e83d2ceae
+pandas 2.3.3, numpy 2.2.6
+
+== Files (sha256)
+species table    bc9ca38ef1c6f98f3826a286d619b5e6497be358f339573b5ce4dc43923ffd66  tallies_wide.species.csv
+VALENCIA input   b926a0ebfe89dcc8d7b8fb32fb9cd171b9a9722b9e7a553049f9144e7648a269  valencia_input_maliampi.csv
+VALENCIA output  7f7a69b0ac7cb78a8146944b761649c8ece8ae45d8e79f7cb707ba625f5abcd0  valencia_output_dream.csv
+centroids        9d18456724e439a1e828ff2dd34dd12e51cc08729ae025aaafabe05390093e96  CST_centroids_012920.csv
+compared output  d475d79686fa395bab65195f71806482a9eb50b1cc91083352215ba5972dce4d  cst_valencia_dream.csv
+
+== Specimens
+species table: 302 specimens, 521 taxa rows
+VALENCIA input: 302 specimens, 259 taxa columns
+VALENCIA output: 302 specimens
+input holds every read of the species table; read_count == row total for every specimen
+
+== Conversion: where the reads go (fraction of all reads in the cohort)
+rank 'species' in the MaLiAmPi table: 91.07 %
+superkingdom-level ranks (kept in read_count, no centroid column): 0.15 %
+all ranks above family together (unclassified_*): 0.86 %
+g_Lactobacillus column: 10.15 %, from 21 Lactobacillus labels (genus level, compounds, and species other than crispatus, iners, gasseri, jensenii)
+  of which species with a column of their own in the centroids: Lactobacillus coleohominis, Lactobacillus delbrueckii, Lactobacillus fermentum, Lactobacillus reuteri, Lactobacillus salivarius (0.99 %)
+Gardnerella at genus level, written as Gardnerella_vaginalis: 0.00 %
+
+== Coverage by the reference centroids
+taxa columns with a centroid column: 114 of 259
+reads in those columns: 97.25 %
+per specimen: median 99.78 %, min 0.33 %, max 100.00 %
+specimens below 80 %: 11
+largest columns without a centroid column:
+  unclassified_class             0.53 %
+  g_Geobacillus                  0.51 %
+  g_Fenollaria                   0.48 %
+  unclassified_superkingdom      0.14 %
+  g_Pelomonas                    0.11 %
+  f_Hungateiclostridiaceae       0.10 %
+  g_Candidatus                   0.10 %
+  g_Mageeibacillus               0.09 %
+
+== Assignment
+ CST  n  n_similarity_below_0.5
+   I 62                       7
+  II 17                      15
+ III 99                      11
+IV-A  0                       0
+IV-B 73                      39
+IV-C 31                      23
+   V 20                       5
+
+subCST  n  n_similarity_below_0.5
+   I-A 42                       0
+   I-B 20                       7
+    II 17                      15
+ III-A 64                       2
+ III-B 35                       9
+  IV-A  0                       0
+  IV-B 73                      39
+ IV-C0 16                      16
+ IV-C1  4                       3
+ IV-C2  0                       0
+ IV-C3  7                       3
+ IV-C4  4                       1
+     V 20                       5
+
+similarity to the assigned subCST: median 0.732, min 0.001; below 0.5: 100 specimens
+specimens below 0.5 similarity and below 80 % coverage: 7
+
+== Compared with cst_valencia_dream.csv
+specimens in both: 302; same subCST: 256; different: 46
+byte-identical files: False
+
+wrote cst_counts.csv and subcst_counts.csv to results/valencia_cst_dream
+== summary by project
+
+== Project all: 302 specimens
+same CST as the Challenge's: 260 (86.1%); same subCST: 256 (84.8%)
+similarity < 0.5: this run 100 (33.1%); the Challenge's assignment 130 (43.0%)
+Lactobacillus johnsonii: 7.89% of the reads; label with most reads in 18 specimens
+Lactobacillus gasseri/johnsonii (compound): 0.15% of the reads
+f_Lachnospiraceae column of the VALENCIA input: 2.08% of the reads
+
+== Project K: 159 specimens
+same CST as the Challenge's: 125 (78.6%); same subCST: 123 (77.4%)
+similarity < 0.5: this run 61 (38.4%); the Challenge's assignment 85 (53.5%)
+Lactobacillus johnsonii: 2.14% of the reads; label with most reads in 4 specimens
+Lactobacillus gasseri/johnsonii (compound): 0.14% of the reads
+f_Lachnospiraceae column of the VALENCIA input: 5.67% of the reads
+
+== Project V: 143 specimens
+same CST as the Challenge's: 135 (94.4%); same subCST: 133 (93.0%)
+similarity < 0.5: this run 39 (27.3%); the Challenge's assignment 45 (31.5%)
+Lactobacillus johnsonii: 9.16% of the reads; label with most reads in 14 specimens
+Lactobacillus gasseri/johnsonii (compound): 0.15% of the reads
+f_Lachnospiraceae column of the VALENCIA input: 1.29% of the reads
+
+== CST by project (n_DREAM: the Challenge's own assignment)
+project  CST  n  n_similarity_below_0.5  n_same_CST_as_DREAM  n_DREAM
+    all    I 62                       7                   57       62
+    all   II 17                      15                   16       20
+    all  III 99                      11                   90       96
+    all IV-A  0                       0                    0        0
+    all IV-B 73                      39                   71       85
+    all IV-C 31                      23                    7       11
+    all    V 20                       5                   19       28
+      K    I 18                       5                   13       16
+      K   II  2                       2                    2        5
+      K  III 61                       8                   52       57
+      K IV-A  0                       0                    0        0
+      K IV-B 52                      28                   50       60
+      K IV-C 20                      16                    3        7
+      K    V  6                       2                    5       14
+      V    I 44                       2                   44       46
+      V   II 15                      13                   14       15
+      V  III 38                       3                   38       39
+      V IV-A  0                       0                    0        0
+      V IV-B 21                      11                   21       25
+      V IV-C 11                       7                    4        4
+      V    V 14                       3                   14       14
+
+== subCST by project
+project subCST  n  n_similarity_below_0.5  n_same_subCST_as_DREAM  n_DREAM
+    all    I-A 42                       0                      41       43
+    all    I-B 20                       7                      16       19
+    all     II 17                      15                      16       20
+    all  III-A 64                       2                      55       60
+    all  III-B 35                       9                      32       36
+    all   IV-A  0                       0                       0        0
+    all   IV-B 73                      39                      71       85
+    all  IV-C0 16                      16                       6       11
+    all  IV-C1  4                       3                       0        0
+    all  IV-C2  0                       0                       0        0
+    all  IV-C3  7                       3                       0        0
+    all  IV-C4  4                       1                       0        0
+    all      V 20                       5                      19       28
+      K    I-A  8                       0                       7        8
+      K    I-B 10                       5                       6        8
+      K     II  2                       2                       2        5
+      K  III-A 35                       2                      26       29
+      K  III-B 26                       6                      24       28
+      K   IV-A  0                       0                       0        0
+      K   IV-B 52                      28                      50       60
+      K  IV-C0 11                      11                       3        7
+      K  IV-C1  2                       2                       0        0
+      K  IV-C2  0                       0                       0        0
+      K  IV-C3  3                       2                       0        0
+      K  IV-C4  4                       1                       0        0
+      K      V  6                       2                       5       14
+      V    I-A 34                       0                      34       35
+      V    I-B 10                       2                      10       11
+      V     II 15                      13                      14       15
+      V  III-A 29                       0                      29       31
+      V  III-B  9                       3                       8        8
+      V   IV-A  0                       0                       0        0
+      V   IV-B 21                      11                      21       25
+      V  IV-C0  5                       5                       3        4
+      V  IV-C1  2                       1                       0        0
+      V  IV-C2  0                       0                       0        0
+      V  IV-C3  4                       1                       0        0
+      V  IV-C4  0                       0                       0        0
+      V      V 14                       3                      14       14
+
+== CST of this run (rows) against the Challenge's (CST_DREAM), non-zero cells
+project  CST CST_DREAM  n
+    all    I         I 57
+    all    I       III  2
+    all    I      IV-B  1
+    all    I      IV-C  1
+    all    I         V  1
+    all   II        II 16
+    all   II      IV-B  1
+    all  III         I  1
+    all  III        II  1
+    all  III       III 90
+    all  III      IV-C  2
+    all  III         V  5
+    all IV-B        II  1
+    all IV-B       III  1
+    all IV-B      IV-B 71
+    all IV-C         I  4
+    all IV-C        II  2
+    all IV-C       III  3
+    all IV-C      IV-B 12
+    all IV-C      IV-C  7
+    all IV-C         V  3
+    all    V      IV-C  1
+    all    V         V 19
+      K    I         I 13
+      K    I       III  2
+      K    I      IV-B  1
+      K    I      IV-C  1
+      K    I         V  1
+      K   II        II  2
+      K  III         I  1
+      K  III        II  1
+      K  III       III 52
+      K  III      IV-C  2
+      K  III         V  5
+      K IV-B        II  1
+      K IV-B       III  1
+      K IV-B      IV-B 50
+      K IV-C         I  2
+      K IV-C        II  1
+      K IV-C       III  2
+      K IV-C      IV-B  9
+      K IV-C      IV-C  3
+      K IV-C         V  3
+      K    V      IV-C  1
+      K    V         V  5
+      V    I         I 44
+      V   II        II 14
+      V   II      IV-B  1
+      V  III       III 38
+      V IV-B      IV-B 21
+      V IV-C         I  2
+      V IV-C        II  1
+      V IV-C       III  1
+      V IV-C      IV-B  3
+      V IV-C      IV-C  4
+      V    V         V 14
+
+wrote cst_by_project.csv, subcst_by_project.csv and cst_vs_dream_by_project.csv to results/valencia_cst_dream
+2026-11-02T18:38:09-03:00

@@ -14,6 +14,7 @@ themselves.
 | Reference package metadata (taxtastic `CONTENTS.json`, RAxML info, summary) | `metadata/` |
 | Aggregated results of the QIIME2 ↔ MaLiAmPi comparison | [`results/concordance/`](../results/concordance/) — per-taxon correlations, per-specimen distances, figures |
 | Counts of specimens per VALENCIA community state type, and the log of the run that produced them | [`results/valencia_cst/`](../results/valencia_cst/) — see [`CST_VALENCIA.md`](CST_VALENCIA.md) |
+| The same counts for DREAM Validation, by Challenge project, with their agreement with the Challenge's own assignment | [`results/valencia_cst_dream/`](../results/valencia_cst_dream/) — see [`CST_VALENCIA.md` §6](CST_VALENCIA.md#6-dream-validation) |
 | The scripts as they were actually run | [`analysis/as_run/`](../analysis/as_run/) |
 
 ## What is not here, and where to find it
@@ -101,7 +102,9 @@ strictly: from the DREAM data, **only aggregates are committed** — counts of s
 participants per community state type, subtype or group, fractions, and the hashes that
 identify inputs and outputs. **Never** a row per specimen or per participant, a Challenge or
 ImmPort identifier, anyone's individual ethnicity, or the ID mapping. Per-specimen outputs,
-where a later step needs them, stay outside the repository, identified here by SHA-256.
+where a later step needs them, stay outside the repository, identified here by SHA-256
+(for the VALENCIA assignment of the validation set, in
+[`CST_VALENCIA.md` §6.4](CST_VALENCIA.md#64-reproducing-it-and-where-the-per-specimen-files-are)).
 
 [synapse-terms]: https://repo-prod.prod.sagebase.org/repo/v1/entity/syn26133770/wiki/618022
 [immport-terms]: https://docs.immport.org/home/agreement/

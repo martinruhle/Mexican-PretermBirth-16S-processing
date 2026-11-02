@@ -75,6 +75,7 @@ median ρ from 0.529, Mantel from 0.940 and Procrustes from 0.917 to the values 
 | Specimen ↔ participant linkage | ✅ one canonical map, identified by SHA-256; every MaLiAmPi ↔ QIIME2 pairing verified (2026-09-21) — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §6](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | QIIME2 ↔ MaLiAmPi concordance | ✅ reproducible from this repository (2026-10-01): [`analysis/concordance_qiime2_maliampi.Rmd`](analysis/concordance_qiime2_maliampi.Rmd) returns the archived numbers and tables from three hash-checked inputs — [`docs/CONCORDANCE_QIIME2_MALIAMPI.md` §7](docs/CONCORDANCE_QIIME2_MALIAMPI.md) |
 | Community state types (VALENCIA) | ✅ assigned (2026-05-25) and re-run from this repository byte for byte (2026-10-28): I 57, III 23, IV-B 28, II 1, IV-C 1, V 1 — [`docs/CST_VALENCIA.md`](docs/CST_VALENCIA.md) |
+| Community state types of DREAM Validation, same converter and VALENCIA | ✅ assigned (2026-11-02), counts by project only; the Challenge's own classification, not harmonized with ours — [`docs/CST_VALENCIA.md` §6](docs/CST_VALENCIA.md#6-dream-validation) |
 | Software environment for the downstream tooling | ⚠️ partially pinned: VALENCIA and its Python pinned (2026-10-28) — [`env/VERSIONS.md`](env/VERSIONS.md) |
 | Phylotype binning (0.1 / 0.5 / 1.0) | 🚧 not started |
 | **External validation on the Michigan cohort** — a different cohort, not more participants for this one | 🚧 planned, and its reads need a different route — [`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md) |
