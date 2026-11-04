@@ -117,6 +117,32 @@ that lacks gestational week or maternal age. The OTU table covers 15 participant
 many of them the 48 specimens with reads reach, and with which of the three variables, is
 the size of the validation, and it can be known before any read is processed.
 
+**Precondition 2, counted.** `MP1.txt` — the QIIME 1 participant↔specimen map, held with the
+reads and the OTU table, downloaded from an email the study's investigators sent with the
+project data (SHA-256 `7263921679fb…`) — assigns the OTU table's 96 specimens (plus its
+`Repetido` column) to **15** participants, 5 to 8 specimens each, each with one outcome: 9
+term, 6 preterm. All 48 of the pool labels (Pool 1's 23, Pool 2's 25) are present, character
+for character, among the OTU table's 97 columns (SHA-256 `a3fb428783c4…`), and they reach
+**8** of the 15 participants, 4 to 8 specimens each — 3 term, 5 preterm, by `MP1.txt`'s own
+outcome for each. Gestational week at sampling and maternal age are present for **none** of
+the 15: neither file carries either variable, the OTU table has no per-column metadata at all
+(QIIME 1.8.0, 2014), and the digit right after a specimen's `N`/`P` letter, which looks
+consistent with the trimester of collection, has not been confirmed against an independent
+source. The per-participant list these counts come from — specimen counts, outcome, and the
+two missing variables, marked absent for all 15 — is held with the project data
+(`michigan_cohort_coverage_48_specimens.csv`, SHA-256 `54f0c20c7580…`), not in this
+repository. A request for the two missing variables and for the unmerged per-specimen reads
+has already gone to the study's investigators; nothing has come back yet.
+
+Two things the count turned up for precondition 1 to resolve: eight of `MP1.txt`'s 96 specimen
+IDs have a missing or doubled digit (for example `N.2.2697`, `P3.3739`) and need normalising
+before they can be matched by string; and one of the eight participants has two specimens
+that the OTU table and Pool 2's reads label with the opposite outcome-letter from the one
+`MP1.txt` gives the rest of her specimens. `MP1.txt`'s own `Treatment` column — the one this
+count uses — is unanimous across all seven of her specimens, so this is a labelling
+disagreement between sources to resolve when the map is built, not an outcome in doubt. Both
+points, with the specific specimen IDs, are noted in `michigan_cohort_coverage_48_specimens.csv`.
+
 ## 5. Open question
 
 Whether to place the Michigan specimens on **our** reference package (as above) or on the
@@ -136,5 +162,6 @@ twice and keep the outputs in separate directories with separate manifests.
 |---|---|
 | Written | 2026-09-24, as `NEXT_STAGE_OLD_RUN.md` |
 | Revised | 2026-10-15: the specimens are a different cohort (Michigan), for external validation; preconditions 2 and 5 follow from that |
+| Revised | 2026-11-04: precondition 2 counted — 8 of the 15 participants are reached by the 48 specimens with reads, none of the 15 has gestational week at sampling or maternal age |
 | Status | planned, not started |
 | Reviewed by | *pending* |
