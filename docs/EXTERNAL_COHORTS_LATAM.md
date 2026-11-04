@@ -203,11 +203,31 @@ women by microscopy and culture.
    planned for the Michigan cohort, and the coverage of that placement has to be measured per
    dataset before any result from it is believed.
 
+## 7. Requests sent
+
+Three of conclusion 5's four requests went out on 2026-10-30, to the group running each
+cohort: COLPRET (Colombia, §2), PrOMIS (Peru, §2) and the São Paulo cohort (§2). The fourth,
+to the Guatemala study's group (§2), followed on 2026-11-04, once it was decided that the
+94-woman V3–V4 subset was worth asking for too, not only the three cohorts already named.
+Every request asked for the raw reads and, per participant, outcome, gestational age at
+sampling and maternal age — the same three variables conclusion 5 specifies.
+
+| Cohort | Date requested | Response, as of 2026-11-04 |
+|---|---|---|
+| COLPRET | 2026-10-30 | none |
+| PrOMIS | 2026-10-30 | none |
+| São Paulo | 2026-10-30 | the group said they would look for the data, but were not sure they could still locate it; no data received |
+| Guatemala | 2026-11-04 | none (too recent) |
+
+No names of people are recorded here, on the same rule as the rest of this document — only
+the group, the cohort and the date.
+
 ---
 
 | | |
 |---|---|
 | Written | 2026-10-21 |
 | Sources | repository metadata through the ENA, NCBI and Europe PMC APIs; article pages as cited. Every number in §1 to §5 was read on the page or API response linked beside it |
+| Revised | 2026-11-04: §7 added, recording the four requests sent and their response status |
 | Status | inventory; no data obtained and none downloaded |
 | Reviewed by | *pending* |
