@@ -176,12 +176,34 @@ for `cmalign` is the configuration under which it exited with status 137, out of
 adjustment. The file is the verbatim machine copy, with the change described in its
 header.
 
+## 13. The Michigan specimen labels point to hospital records, so those data cannot be deposited as they are
+
+**Status:** open. **Blocks:** any public deposit of the Michigan cohort's OTU table, reads,
+or files derived from them, including the outputs of preconditions 3 and 4 of
+[`docs/NEXT_STAGE_MICHIGAN_COHORT.md`](docs/NEXT_STAGE_MICHIGAN_COHORT.md), here or in
+[`Mexican-PretermBirth-external-cohorts`](https://github.com/martinruhle/Mexican-PretermBirth-external-cohorts).
+
+The notes the study's investigators sent with the Michigan data (SHA-256 `f370c566…`)
+give the key of the specimen labels: each encodes the pregnancy outcome and the time of
+collection, and ends in an identifier assigned by the hospital of origin. The labels are
+the OTU table's column names and are written into every read record of the two pools, so
+any file produced from these data carries them unless they are replaced. The rule, and
+what is and is not committed, is in
+[`docs/DATA_ACCESS.md`](docs/DATA_ACCESS.md#specimen-labels-of-the-michigan-cohort).
+
+Earlier versions of `docs/NEXT_STAGE_MICHIGAN_COHORT.md` (from 2026-10-15) quoted four
+real labels. They were replaced on 2026-11-10 by an invented example and a description of
+the pattern; the repository history is not rewritten. The key itself has not been
+published. To close: relabel the OTU table and the reads with codes that carry no outcome,
+time or hospital component, keep the table linking codes to labels with the project data,
+and record its SHA-256 here.
+
 ---
 
 ## Resolved
 
 Items 1, 2, 3, 4, 5, 6, 8, 9 and 12 above are resolved and kept in place, so that
-references to them by number stay valid. Items 7, 10 and 11 remain open.
+references to them by number stay valid. Items 7, 10, 11 and 13 remain open.
 
 **The WSL machine held the answers to five of them.** On 2026-09-24,
 `\\wsl.localhost\Ubuntu-22.04\home\martinruhle` was inspected: the run directory, its
@@ -212,4 +234,4 @@ found needs updating, but the manuscript PDF was not searched.
 
 ---
 
-*Last updated 2026-10-07.*
+*Last updated 2026-11-10.*

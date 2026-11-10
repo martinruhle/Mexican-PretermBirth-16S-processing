@@ -120,6 +120,32 @@ Aggregated results are a different matter and are committed: a correlation per g
 a distance per specimen, a figure. None of them can be inverted back into an abundance
 profile.
 
+### Specimen labels of the Michigan cohort
+
+The specimen labels of the Michigan cohort
+([`NEXT_STAGE_MICHIGAN_COHORT.md`](NEXT_STAGE_MICHIGAN_COHORT.md)) are participant-level
+data, not neutral identifiers. According to notes the study's investigators sent with the
+data (`NOTAS Archivos.docx`, SHA-256
+`f370c5666de79f6463c6476f3216e63fef90a3ccc3caa0bc97d91ec9f88a7694`, held with the project
+data), each label encodes the pregnancy outcome and the time of collection, and its final
+number is an identifier assigned by the hospital of origin, not a study ID. A label is
+therefore a pointer into a hospital's records, joined to a clinical outcome.
+
+- **No real label is written into a committed file or a commit message.** Where a document
+  needs an example, it uses an invented one in which no field is a value a real label can
+  take (`X0.0.000`), and says that it is invented. Labels with an irregular form are
+  described by their pattern, not quoted.
+- **The key is not reproduced here.** The notes stay with the project data, identified by the
+  hash above.
+- **The Michigan OTU table and reads are not deposited in any public place under these
+  labels**, and neither is any file derived from them that carries the labels. Every label —
+  the OTU table's column names, the identifier of every read record, the specimen column of
+  any output — is first replaced by a code with no outcome, time or hospital component, and
+  the table linking the new codes to the old labels stays with the project data. The same
+  holds for the repository that analyses the external cohorts,
+  [`Mexican-PretermBirth-external-cohorts`](https://github.com/martinruhle/Mexican-PretermBirth-external-cohorts).
+  Tracked as [`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 13.
+
 ## Getting access
 
 The cohort is coordinated at the Instituto Nacional de Perinatología, Mexico City.
@@ -129,4 +155,4 @@ published article's data availability statement.
 
 ---
 
-*Last updated 2026-11-02.*
+*Last updated 2026-11-10.*

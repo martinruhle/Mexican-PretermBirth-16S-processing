@@ -32,9 +32,20 @@ specimens, and which participants they cover is now established (§4, preconditi
 The two FASTQ files are outputs of QIIME 1's `split_libraries_fastq.py`: already
 demultiplexed, already quality-filtered at q20, with forward and reverse reads **already
 merged** (≈465 bp, consistent with a joined V3–V4 amplicon). Each record's label carries
-the specimen and the barcode, in the form `P2.3.393_0 M01459:6:000000000-A7UGB:...
-orig_bc=CTTGTA new_bc=CTTGTA bc_diffs=0`. The two pools are two separate MiSeq runs, not
+the specimen and the barcode, in the form `X0.0.000_0 M01459:6:000000000-A7UGB:...
+orig_bc=NNNNNN new_bc=NNNNNN bc_diffs=0`. The two pools are two separate MiSeq runs, not
 one: Pool 1 is `M01459:6:000000000-A7UGB`, Pool 2 is `M01459:4:000000000-A7Y0H`.
+
+The specimen label and the barcode in that example are invented, and none of their fields
+is a value a real record can take. No real specimen label of this cohort is reproduced in
+this repository, because the labels are participant-level data
+([`DATA_ACCESS.md`](DATA_ACCESS.md#specimen-labels-of-the-michigan-cohort)). What
+precondition 1 needs to know about them is this: each label encodes the pregnancy outcome
+letter and the time of collection, and its final number is an identifier assigned by the
+hospital of origin, not a study ID. The full key is in notes the study's investigators sent
+with the data (`NOTAS Archivos.docx`, SHA-256
+`f370c5666de79f6463c6476f3216e63fef90a3ccc3caa0bc97d91ec9f88a7694`), held with the project
+data and not reproduced here.
 
 **These are the only reads available for these specimens in this project.** The
 per-specimen, unmerged FASTQ files the sequencer produced are not available here. That is
@@ -111,7 +122,7 @@ and the other is a different denoiser's output on already-merged, already-filter
 
 | # | Task | Product that proves it is done |
 |---|---|---|
-| 1 | Establish the specimen ↔ participant link for the Michigan specimens, verified the way the Mexican one was. Their labels (`P2.3.393`) are not `Au###`, and the canonical map does not cover them: it is the Mexican cohort's map. | A map with the same guarantees as the canonical one, its own SHA-256 in `metadata/`, and a verification log. See [`CONCORDANCE_QIIME2_MALIAMPI.md` §6](CONCORDANCE_QIIME2_MALIAMPI.md) |
+| 1 | Establish the specimen ↔ participant link for the Michigan specimens, verified the way the Mexican one was. Their labels (of the form `X0.0.000`, an invented example, §1) are not `Au###`, and the canonical map does not cover them: it is the Mexican cohort's map. | A map with the same guarantees as the canonical one, its own SHA-256 in `metadata/`, and a verification log. See [`CONCORDANCE_QIIME2_MALIAMPI.md` §6](CONCORDANCE_QIIME2_MALIAMPI.md) |
 | 2 | Establish which participants the 48 specimens with reads belong to, and whether their metadata exist: **outcome** (term or preterm), **gestational week at sampling** and **maternal age** — the variables of the minimal adjustment, Approach 1, of the [analysis compendium](https://github.com/martinruhle/Mexican-PretermBirth-analysis#clinical-variable-sets). | The list of participants covered by the 48 specimens, with each of the three variables marked as present or absent, held with the project data like the map. Recorded here, counts only: participants covered, the range of specimens per participant, and how many participants have each variable |
 | 3 | Split, dereplicate and denoise the pools (§3 steps 1–3). | Per-specimen denoised sequences with weights, counted, and a record of how many reads each specimen contributed |
 | 4 | Place and classify on the existing reference package (§3 steps 4–5). | An output directory with its own manifest under `metadata/`, and a run record written like [`RUN_MALIAMPI.md`](RUN_MALIAMPI.md) |
@@ -138,22 +149,27 @@ for character, among the OTU table's 97 columns (SHA-256 `a3fb428783c4…`), and
 **8** of the 15 participants, 4 to 8 specimens each — 3 term, 5 preterm, by `MP1.txt`'s own
 outcome for each. Gestational week at sampling and maternal age are present for **none** of
 the 15: neither file carries either variable, the OTU table has no per-column metadata at all
-(QIIME 1.8.0, 2014), and the digit right after a specimen's `N`/`P` letter, which looks
-consistent with the trimester of collection, has not been confirmed against an independent
-source. The per-participant list these counts come from — specimen counts, outcome, and the
+(QIIME 1.8.0, 2014), and the time of collection that the specimen label encodes (§1) is not
+a gestational week. The per-participant list these counts come from — specimen counts, outcome, and the
 two missing variables, marked absent for all 15 — is held with the project data
 (`michigan_cohort_coverage_48_specimens.csv`, SHA-256 `54f0c20c7580…`), not in this
 repository. A request for the two missing variables and for the unmerged per-specimen reads
 has already gone to the study's investigators; nothing has come back yet.
 
 Two things the count turned up for precondition 1 to resolve: eight of `MP1.txt`'s 96 specimen
-IDs have a missing or doubled digit (for example `N.2.2697`, `P3.3739`) and need normalising
-before they can be matched by string; and one of the eight participants has two specimens
+IDs have a separator out of place — seven carry a stray dot right after the outcome letter,
+four lack the dot before the final number, three of them both — and need normalising before
+they can be matched by string; and one of the eight participants has two specimens
 that the OTU table and Pool 2's reads label with the opposite outcome-letter from the one
 `MP1.txt` gives the rest of her specimens. `MP1.txt`'s own `Treatment` column — the one this
 count uses — is unanimous across all seven of her specimens, so this is a labelling
 disagreement between sources to resolve when the map is built, not an outcome in doubt. Both
 points, with the specific specimen IDs, are noted in `michigan_cohort_coverage_48_specimens.csv`.
+
+Preconditions 3 and 4 write per-specimen files keyed by the specimen labels. Those files, like
+the OTU table and the reads they come from, are not deposited in any public place until every
+label in them has been replaced by a code with no outcome, time or hospital component
+([`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 13).
 
 ## 5. Open question
 
@@ -176,5 +192,6 @@ place twice and keep the outputs in separate directories with separate manifests
 | Revised | 2026-10-15: the specimens are a different cohort (Michigan), for external validation; preconditions 2 and 5 follow from that |
 | Revised | 2026-11-04: precondition 2 counted — 8 of the 15 participants are reached by the 48 specimens with reads, none of the 15 has gestational week at sampling or maternal age |
 | Revised | 2026-11-04: two MiSeq runs, not one; Pool 1's copy is truncated; the route denoises before placing, it does not skip denoising; the specimens are Mexican, not a different population |
+| Revised | 2026-11-10: specimen labels are participant-level data; the examples are invented, the irregular IDs are described by their pattern, what a label encodes is stated without the key, and the investigators' notes are cited by SHA-256; no public deposit before relabelling |
 | Status | planned, not started |
 | Reviewed by | *pending* |
