@@ -212,12 +212,16 @@ to the Guatemala study's group (§2), followed on 2026-11-04, once it was decide
 Every request asked for the raw reads and, per participant, outcome, gestational age at
 sampling and maternal age — the same three variables conclusion 5 specifies.
 
-| Cohort | Date requested | Response, as of 2026-11-04 |
+| Cohort | Date requested | Response, as of 2026-11-10 |
 |---|---|---|
 | COLPRET | 2026-10-30 | none |
-| PrOMIS | 2026-10-30 | none |
-| São Paulo | 2026-10-30 | the group said they would look for the data, but were not sure they could still locate it; no data received |
-| Guatemala | 2026-11-04 | none (too recent) |
+| PrOMIS | 2026-10-30 | **the group agreed to share the data** (2026-11-08), and will prepare them after 2026-11-21. No data received |
+| São Paulo | 2026-10-30 | the group said they would look for the data, but were not sure they could still locate it, and referred the request to the corresponding author of the 2019 article, whose laboratory did the sequencing; the request went to that author on 2026-11-05, with no response yet. The per-sample taxon counts of the 629 women are public as that article's Table S2 (222 taxa, DADA2 sequence variants classified with RDP), without outcome, gestational age or maternal age; the reads are not. No data received |
+| Guatemala | 2026-11-04 | **data received on 2026-11-05**: the 94 per-sample read pairs, as sequenced, and a per-woman workbook, without a data transfer agreement, since the providers consider the data meant to be public. No accession exists (SRA and ENA searched on 2026-11-05). The workbook has no gestational age and no outcome of the sampled pregnancy, which the article followed up only for women colonized by group B *Streptococcus*, 8 of the 94. The providers are checking their study database for gestational age at enrollment, and will deposit the reads in SRA and send the accession once that check is done |
+
+The Guatemala files, their hashes and the checks run on them are recorded in the data
+access document of the repository that analyses the external cohorts
+([`Mexican-PretermBirth-external-cohorts/docs/DATA_ACCESS.md`](https://github.com/martinruhle/Mexican-PretermBirth-external-cohorts/blob/26608598c6dad534df27998bc2dad977c367138a/docs/DATA_ACCESS.md#guatemala-cohort-rick-et-al-2017)).
 
 No names of people are recorded here, on the same rule as the rest of this document — only
 the group, the cohort and the date.
@@ -228,6 +232,6 @@ the group, the cohort and the date.
 |---|---|
 | Written | 2026-10-21 |
 | Sources | repository metadata through the ENA, NCBI and Europe PMC APIs; article pages as cited. Every number in §1 to §5 was read on the page or API response linked beside it |
-| Revised | 2026-11-04: §7 added, recording the four requests sent and their response status |
-| Status | inventory; no data obtained and none downloaded |
+| Revised | 2026-11-04: §7 added, recording the four requests sent and their response status. 2026-11-05: §7 updated with the São Paulo referral and its public count table, and with the Guatemala data received. 2026-11-10: §7 updated with the PrOMIS agreement, the São Paulo request to the corresponding author, and the Guatemala deposit plan |
+| Status | inventory; of the datasets requested, the Guatemala reads were obtained (2026-11-05) and are held outside this repository |
 | Reviewed by | *pending* |
