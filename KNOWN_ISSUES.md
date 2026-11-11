@@ -47,8 +47,9 @@ copy that was in effect for the final session (item 12).
 This item recorded that `tallies_wide.species.csv` reports `Au122_S41`. It does not. Both
 copies of that file (SHA-256 `61c030dc…`, the one in the manifest) say `Au122_S43`. So do
 `tallies_wide.genus.csv`, the 1,415 rows of `dada2.specimen.sv.long.csv`, the FASTQ file
-names and the MaLiAmPi input manifest. The sequencer's QC report puts Au122 at position
-43 of the sample sheet. A search of the project data folder and of the analysis
+names and the MaLiAmPi input manifest. The sequencing QC report (`QCS_22Jul24_412.pdf`,
+SHA-256 `39075a5b…`; [`docs/RUN_MALIAMPI.md` §2](docs/RUN_MALIAMPI.md)) puts Au122 at
+position 43 of the sample sheet. A search of the project data folder and of the analysis
 compendium finds `Au122_S41` nowhere. Joins go through the Au number alone (item 8), so
 the suffix does not enter any join.
 
@@ -108,6 +109,14 @@ On 2026-09-21 the identifiers were checked against each other for all 111 specim
   canonical map.
 - MaLiAmPi read totals track the sequencer's per-specimen read counts (Spearman 0.914)
   and the QIIME2 counts of the same Au (0.947).
+
+The sequencer's QC report is the sequencing facility's report for project 412,
+`QCS_22Jul24_412.pdf` (SHA-256
+`39075a5b5a740dec7774dec6df3e41f66efe53399cc7ed5b9408ce0abc1d2ece`, held with the project
+data; [`docs/RUN_MALIAMPI.md` §2](docs/RUN_MALIAMPI.md)). The verification script reads
+the sample-sheet positions from it directly. The per-specimen read counts it uses are the
+canonical map's `lecturas_crudas`, which equal that report's read counts for all 111
+specimens (checked 2026-11-11).
 
 The join key is the Au number. MaLiAmPi's `_S##` suffix is dropped before joining. The
 evidence is [`analysis/as_run/verify_sample_pairing_2026-09-21.R`](analysis/as_run/verify_sample_pairing_2026-09-21.R)

@@ -135,14 +135,16 @@ None of the tests relies on a label typed by hand:
    (`level-6_vag138.xlsx`, rows named by QIIME2's own sample IDs). 106 match their own
    label and 4 match their pair partner.
 2. **Sequencing depth.** Across the 111 specimens, the MaLiAmPi total per specimen tracks
-   the sequencer's read count for the same Au### in the QC report (Spearman 0.914; the
-   MaLiAmPi / raw ratio stays between 0.25 and 0.80, with no outlier). It also tracks the
+   the sequencer's read count for the same Au### in the sequencing QC report,
+   `QCS_22Jul24_412.pdf` (SHA-256 `39075a5b…`; [`RUN_MALIAMPI.md` §2](RUN_MALIAMPI.md)):
+   Spearman 0.914, and the MaLiAmPi / raw ratio stays between 0.25 and 0.80, with no
+   outlier. It also tracks the
    QIIME2 count for the same Au### (0.947). With the pairing the May run used, that
    second correlation drops to 0.871. For example, MaLiAmPi's Au197 has 441,632 reads and
    was paired with a QIIME2 profile of 15,515 counts, when its own profile has 63,110.
 3. **Sample-sheet position.** All 111 MaLiAmPi column suffixes `_S##` equal the
-   specimen's position in the sequencer's sample sheet (QC report). The MaLiAmPi side of
-   the join is therefore anchored to the sequencer, not to a table.
+   specimen's position in the sequencer's sample sheet (the same sequencing QC report).
+   The MaLiAmPi side of the join is therefore anchored to the sequencer, not to a table.
 4. **Composition.** For the four affected specimens, the paired Bray–Curtis drops from
    0.27 / 0.09 / 0.57 / 0.46 (Au52 / Au197 / Au179 / Au203, May) to 0.17 / 0.05 / 0.17 /
    0.20 against their own QIIME2 profile.
@@ -189,8 +191,10 @@ source: `mapa_muestras_2026-09-20.csv`. It has 111 rows, one per sequenced speci
 the columns `Au`, `index`, `id`, `visita`, `sdg_visita`, `desenlace_parto`,
 `lecturas_crudas`, `conteos_qiime`, `conc_biblioteca_ng_ul`, `en_analisis`, `motivo`. It
 was built by matching count fingerprints against the raw QIIME2 export, and checked
-against the validated clinical table and the two QC reports (library concentration,
-sequencing). 110 specimens are in the analysis. Au297 is excluded (328 QIIME2 counts,
+against the validated clinical table and the sequencing facility's two QC reports: library
+QC, for the concentration (`QCB_08julio2024_No.412.pdf`, SHA-256 `ce3cbbb4…`), and
+sequencing QC, for the read counts (`QCS_22Jul24_412.pdf`, SHA-256 `39075a5b…`); both are
+described in [`RUN_MALIAMPI.md` §2](RUN_MALIAMPI.md). 110 specimens are in the analysis. Au297 is excluded (328 QIIME2 counts,
 below the 1,000-count filter).
 
 - It is clinical metadata, so it is **not in this repository**. A local copy lives at
@@ -282,6 +286,7 @@ above; see [`DATA_ACCESS.md`](DATA_ACCESS.md).
 | | |
 |---|---|
 | Written | 2026-08-30 |
+| QC reports cited by file name and SHA-256 | 2026-11-11 |
 | Reproducible report | 2026-10-01 |
 | Pairing verified, re-run | 2026-09-21 |
 | First run | 2026-05-22 |

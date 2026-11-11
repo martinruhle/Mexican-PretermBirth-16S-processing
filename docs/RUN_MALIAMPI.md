@@ -13,14 +13,19 @@ The reference package the run built is documented separately, in
 
 ## 1. In one paragraph
 
-111 vaginal 16S amplicon libraries (V3–V4, paired-end, Illumina MiSeq) from the Mexican
-preterm birth cohort were processed with **MaLiAmPi**, pinned by commit `333d83ba9881`
-plus a local patch (§4), under **Nextflow 25.04.8** on a laptop running Ubuntu under
-WSL2, with Docker containers and 6 CPUs / 11.7 GB of RAM (§4). The pipeline denoised
+111 vaginal 16S amplicon libraries (V3–V4, paired-end 2 × 300, Illumina NextSeq 2000)
+from the Mexican preterm birth cohort — specimens collected between January 2022 and
+March 2024, sequenced in July 2024 (§2) — were processed with **MaLiAmPi**, pinned by
+commit `333d83ba9881` plus a local patch (§4), under **Nextflow 25.04.8** on a laptop
+running Ubuntu under WSL2, with Docker containers and 6 CPUs / 11.7 GB of RAM (§4). The pipeline denoised
 the reads with DADA2, built a 16S reference package from the ARF reference sequence
 repository, placed every sequence variant on that reference phylogeny with pplacer, and
-classified the placements into taxonomic tables. The run was carried out in many resumed
-sessions and finished on **2026-02-18 12:00:03**, with **970.1 accumulated CPU hours**.
+classified the placements into taxonomic tables. The computation was carried out in many
+resumed sessions between **2025-10-17 and 2026-02-18**, with **970.1 accumulated CPU
+hours**. The date this record cites for the run, **2026-02-18 12:00:03**, is when the
+final session ended: a 5 m 48 s pass that rebuilt only the taxonomic tables, on top of
+denoising cached since October–November 2025 and a reference package and placements
+produced in the preceding session (§5).
 No specimen failed. Phylotype binning — the step that would let these data be pooled
 with the DREAM Challenge cohorts — **was not run**.
 
@@ -40,13 +45,33 @@ and compatibility problems that had to be solved to fit it on a laptop:
 | `batch` values | 12 groups: `lote_1`–`lote_3` with 10 specimens each, `lote_4`–`lote_12` with 9 each |
 | Reference repository | ARF release `arf_20200420`, from Zenodo (<https://zenodo.org/records/6876634>), unpacked at `~/arf_20200420/`. Inputs used: `dedup/1200bp/named/filtered/seqs.fasta`, the matching `seq_info.csv`, and the `taxdmp.zip` shipped with it |
 
+### Where the 111 libraries come from, and how they were sequenced
+
+| | |
+|---|---|
+| Collection | specimens collected between **January 2022 and March 2024**. Source: the notes the study's investigators sent with the project data (SHA-256 `f370c566…`, [`DATA_ACCESS.md`](DATA_ACCESS.md)). Those notes describe this cohort and the Michigan cohort side by side; the collection window is this cohort's |
+| Library QC | **121** specimens went through library QC (TapeStation DNA1000) on **2024-07-08**: **111 passed, 10 failed**. The 111 that passed are exactly the 111 in the sequencing report below and in the MaLiAmPi manifest. This is where the manifest's 111 comes from |
+| Sequencing | Illumina **NextSeq 2000** (reported as "NextSeq2k"), P1 600-cycle reagents, **2 × 300**, 79.84 Gbp, mean %Q30 85.46, report dated **2024-07-22**. Sequencing therefore took place between 8 and 22 July 2024 |
+| Run | a single run on a single flow cell: the first read header of all 111 R1 files is `@VH01014:74:AAF7JF5M5:1` (instrument `VH01014`, run 74, flow cell `AAF7JF5M5`, lane 1) |
+| Sources | the sequencing facility's two QC reports for project 412, held with the project data (folder `QC/`), not in this repository: library QC `QCB_08julio2024_No.412.pdf` (13 pages, SHA-256 `ce3cbbb4dcfa8ca37dd157d26979826a51425e345dcba0efd925b0793de0c62f`) and sequencing QC `QCS_22Jul24_412.pdf` (5 pages, SHA-256 `39075a5b5a740dec7774dec6df3e41f66efe53399cc7ed5b9408ce0abc1d2ece`). The sequencing report also lists, per specimen, the sample-sheet position and the read count used to check the sample pairing ([`KNOWN_ISSUES.md`](../KNOWN_ISSUES.md) item 8) |
+
+Three independent observations give the instrument, and they agree:
+1. the sequencing QC report names it ("NextSeq2k, P1 600, 2x300");
+2. the instrument ID in the read headers starts with `VH`, the prefix Illumina uses for
+   the NextSeq 1000/2000 (MiSeq instrument IDs start with `M`);
+3. the untrimmed reads are 301 nt long (the longest read among the first 1,000 of every R1
+   and R2 file), which is the 2 × 300 configuration of the report.
+
+The platform was recorded here as an Illumina MiSeq until 2026-11-11. No number in this
+record or in the tables depends on that label.
+
 > ### ⚠️ The `batch` column is not a sequencing batch
 >
 > Anyone reading a column called `batch` will assume library preparation batches and may
 > reach for it as a technical covariate. **It is not one.** All 111 specimens come from
-> one sequencing effort. The column is an engineering device: MaLiAmPi dereplicates all
-> specimens of a batch together, and dereplicating 111 at once exhausted the available
-> RAM, so they were split into 12 artificial groups of 9–10
+> one sequencing run on one flow cell (above). The column is an engineering device:
+> MaLiAmPi dereplicates all specimens of a batch together, and dereplicating 111 at once
+> exhausted the available RAM, so they were split into 12 artificial groups of 9–10
 > ([`TROUBLESHOOTING.md` §1](TROUBLESHOOTING.md)).
 >
 > This has one real methodological cost, stated here rather than buried: **DADA2 learns
@@ -166,6 +191,45 @@ several months on a laptop, so in any one session most processes report as cache
 Full process table and completion trailer:
 [`logs/maliampi_run_summary_2026-02-18.txt`](../logs/maliampi_run_summary_2026-02-18.txt).
 
+### When each part was computed
+
+The date 2026-02-18 describes the final pass, not the computation. The modification times
+of the output tree, read on the WSL machine on 2026-11-11, place each stage:
+
+| When | What was produced |
+|---|---|
+| 2025-10-17 | `sv/errM/null/`, a pair of error-model files from an earlier launch (below) |
+| 2025-10-21 | FastQC reports (888 files) |
+| 2025-10-21 → 2025-10-23 | the 24 per-batch error models, `sv/errM/lote_*/` |
+| 2025-11-04 | `sv/failed_specimens.csv` |
+| 2025-11-06 08:55–08:56 | combined sequence table with bimeras removed, `dada2.sv.fasta`, `dada2.sv.weights.csv` |
+| 2026-02-17 22:11 | `refpkg/refpkg.tar.gz` |
+| 2026-02-18 05:25–05:28 | placement: `dedup.jplace`, EDPL, alpha diversity, ADCL, KR distance, PCA |
+| 2026-02-18 11:59–12:00 | `classify/` tables (`tallies_wide`, `by_taxon`, `by_specimen` at six ranks) |
+
+Nextflow keeps the log of the current launch and of the nine before it. Nine logs of the
+run survive, all from 13–18 February 2026; the logs of earlier sessions were rotated out
+(the runtime header in [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_header.txt)
+is from one of them, of 2025-11-06). In each of the nine, the DADA2 error-learning step
+appears as cached exactly 24 times (12 batches × R1/R2): denoising was finished before
+any of them started. The second-to-last session (2026-02-17 12:17:50 → 2026-02-18
+05:37:07) built the reference package and placed the variants. The final session
+(2026-02-18 11:54:13 → 12:00:03) submitted 10 tasks, all of them classification
+(`ClassifyTables` × 6, `Extract_Taxonomy`, `ClassifySV`, `ClassifyMCC`, `ClassifyDB_Prep`),
+and took the other 1,133 from the cache.
+
+Two consequences:
+- **The run cannot be resumed from its caches.** The work directory
+  (`~/datos_microbiota_vaginal/working_dir`) no longer exists. Re-running means running
+  from the reads ([§8](#8-how-to-re-run-and-how-to-check)).
+- **`sv/errM/` has thirteen subdirectories, not twelve.** Besides `lote_1`…`lote_12` it
+  holds `null/`, written on 2025-10-17, four days before any batch. None of its four
+  files is identical (MD5) to any file of the batches, so it is not a copy, and the
+  final graph's 24 cached error-learning tasks are the twelve batches. `null` is the
+  batch value the workflow receives when the manifest has no `batch` column: it is left
+  over from a launch before that column was added
+  ([`TROUBLESHOOTING.md` §1](TROUBLESHOOTING.md)). No output of the run derives from it.
+
 ## 6. Output
 
 Directory layout under the `--output` directory. Every file, with its size and
@@ -177,7 +241,7 @@ SHA-256, is listed in
 |---|---|---|
 | `sv/dada2.sv.fasta` | **21,382** sequence variants | 9.1 MB |
 | `sv/dada2.specimen.sv.long.csv` | per-specimen SV counts, long form | 5.4 MB |
-| `sv/errM/lote_*/` | DADA2 error model per batch | small |
+| `sv/errM/lote_*/` | DADA2 error model per batch (the extra `sv/errM/null/` is left over from an earlier launch; §5) | small |
 | `sv/failed_specimens.csv` | empty — no specimen failed | 24 B |
 | `refpkg/refpkg.tar.gz` | the reference package built by the run | 6.1 MB |
 | `placement/dedup.jplace` | placements of the deduplicated SVs on the reference tree | 57 MB |
@@ -318,4 +382,5 @@ weeks, not hours.
 | | |
 |---|---|
 | Written | 2026-08-30 |
+| Revised | 2026-11-11: one memory value, 11.7 GB, with its source (§4). The sequencing platform, NextSeq 2000, with the three observations that give it; the collection and sequencing dates and where the 111 libraries come from, from the facility's two QC reports cited by SHA-256 (§2); when each stage was computed, and the 2026-02-18 date read as the final pass (§1, §5) |
 | Reviewed by | *pending* |
