@@ -1,7 +1,8 @@
 # What broke, and how it was fixed
 
-MaLiAmPi is written for a cluster. This run happened on a laptop with 6 CPUs and 11.5 GB
-of RAM available to the pipeline, which is well under what the author's default profile
+MaLiAmPi is written for a cluster. This run happened on a laptop with 6 CPUs and 11.7 GB
+of RAM available to the pipeline (as Nextflow reports it, under a WSL2 limit of 12 GB; see
+[`RUN_MALIAMPI.md` §4](RUN_MALIAMPI.md)), which is well under what the author's default profile
 assumes (`mem_veryhigh = 32 GB`). Every configuration value in
 [`env/nextflow.config`](../env/nextflow.config) is scaled down from those defaults.
 
@@ -119,10 +120,11 @@ over months of wall clock.
 
 ## 6. A `gappa` problem inside the EPA-NG module
 
-**Fix.** Use the `maliampi_pplacer` variant, which places with pplacer instead of EPA-NG
-— the author's own recommendation. This required a local edit to `main.nf`; the exact
-change, and the fact that the patch file is not yet in this repository, are documented in
-[`RUN_MALIAMPI.md` §4](RUN_MALIAMPI.md).
+**Fix.** Place with the workflow's own pplacer module (`pplacer_place_classify.nf`)
+instead of EPA-NG — the author's own recommendation. This required a local edit to
+`main.nf`; the exact change is documented in [`RUN_MALIAMPI.md` §4](RUN_MALIAMPI.md),
+and the patch is committed as
+[`workflow/patches/main.nf.pplacer.patch`](../workflow/patches/main.nf.pplacer.patch).
 
 ---
 

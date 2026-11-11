@@ -16,7 +16,7 @@ The reference package the run built is documented separately, in
 111 vaginal 16S amplicon libraries (V3–V4, paired-end, Illumina MiSeq) from the Mexican
 preterm birth cohort were processed with **MaLiAmPi**, pinned by commit `333d83ba9881`
 plus a local patch (§4), under **Nextflow 25.04.8** on a laptop running Ubuntu under
-WSL2, with Docker containers and 6 CPUs / 11.5 GB of RAM. The pipeline denoised
+WSL2, with Docker containers and 6 CPUs / 11.7 GB of RAM (§4). The pipeline denoised
 the reads with DADA2, built a 16S reference package from the ARF reference sequence
 repository, placed every sequence variant on that reference phylogeny with pplacer, and
 classified the placements into taxonomic tables. The run was carried out in many resumed
@@ -120,7 +120,7 @@ diversity, KR distance, classify, tables).
 | Runtime | Groovy 4.0.26 on OpenJDK 17.0.16 |
 | OS | Linux 6.6.87.2-microsoft-standard-WSL2 (Ubuntu under WSL2 on a Windows host) |
 | Executor | `local`, Docker enabled (`-u 1000:1000`) |
-| Resources | 6 CPUs, 11.7 GB RAM, 8 GB swap (see [`env/wslconfig.txt`](../env/wslconfig.txt)) |
+| Resources | 6 CPUs, 11.7 GB RAM, 8 GB swap, as Nextflow reports them at the start of every session (`CPUs: 6 - Mem: 11.7 GB`, the same in every Nextflow log kept on the machine and in [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_header.txt)). They come from the WSL2 limits `processors=6`, `memory=12GB`, `swap=8GB` in [`env/wslconfig.txt`](../env/wslconfig.txt); the kernel sees slightly less than the 12 GB limit |
 | Process profile | `standard` — per-label CPU and memory caps in [`env/nextflow.config`](../env/nextflow.config) |
 | Tool versions inside containers | pinned by the workflow source, not by us. All seventeen tags were read off the pinned commit on 2026-09-24 and are listed in [`env/VERSIONS.md`](../env/VERSIONS.md) |
 
@@ -131,9 +131,11 @@ Verbatim source: [`logs/nextflow_runtime_header.txt`](../logs/nextflow_runtime_h
 > Two departures from an off-the-shelf `nextflow run`, both of which have to be
 > reproduced or the run cannot be:
 >
-> 1. **Placement uses pplacer, not EPA-NG.** The `maliampi_pplacer` variant was used
->    instead of the default path, because of a known `gappa` problem inside the EPA-NG
->    module; using `pplacer_place_classify.nf` is the author's own recommendation.
+> 1. **Placement uses pplacer, not EPA-NG.** The workflow's own pplacer module,
+>    `pplacer_place_classify.nf`, was used instead of the default EPA-NG path, because of
+>    a known `gappa` problem inside the EPA-NG module; using it is the author's own
+>    recommendation. `maliampi_pplacer` is only the name of the local directory the
+>    workflow was cloned into (see the table above), not a separate version of MaLiAmPi.
 > 2. **`main.nf` was edited locally.** In `//Modules`,
 >    `include { epang_place_classify_wf }` was changed to
 >    `include { pplacer_place_classify_wf }`; in *STEP 3. Place and Classify*, the call
