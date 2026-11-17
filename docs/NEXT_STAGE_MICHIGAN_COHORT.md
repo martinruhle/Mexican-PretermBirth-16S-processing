@@ -34,7 +34,8 @@ demultiplexed, already quality-filtered at q20, with forward and reverse reads *
 merged** (≈465 bp, consistent with a joined V3–V4 amplicon). Each record's label carries
 the specimen and the barcode, in the form `X0.0.000_0 M01459:6:000000000-A7UGB:...
 orig_bc=NNNNNN new_bc=NNNNNN bc_diffs=0`. The two pools are two separate MiSeq runs, not
-one: Pool 1 is `M01459:6:000000000-A7UGB`, Pool 2 is `M01459:4:000000000-A7Y0H`.
+one: Pool 1 is `M01459:6:000000000-A7UGB`, Pool 2 is `M01459:4:000000000-A7Y0H`. They are
+two of the cohort's four sequencing batches (below).
 
 The specimen label and the barcode in that example are invented, and none of their fields
 is a value a real record can take. No real specimen label of this cohort is reproduced in
@@ -50,6 +51,40 @@ data and not reproduced here.
 **These are the only reads available for these specimens in this project.** The
 per-specimen, unmerged FASTQ files the sequencer produced are not available here. That is
 a fact about what this project holds, not a search that can be repeated more thoroughly.
+
+### What the investigators' notes establish
+
+The notes the study's investigators sent with the data (`NOTAS Archivos.docx`, SHA-256
+`f370c566…`, above) add the following, each checked against the data where the data can
+check it:
+
+- **Why the cohort is called Michigan.** It was a collaborative project funded from
+  Michigan; the patients are Mexican. The name records the funding, not the population
+  (§3, "What this route does not fix").
+- **Specimen type:** cervicovaginal swabs.
+- **Four sequencing batches of 25, for 100 specimens.** The batch size was set by the
+  number of barcodes available at the time, 25. The OTU table joins all four batches. The
+  investigators hold a separate `otu_table.biom` for each of the four runs, offered on
+  request, and are looking for the FASTQ files of those runs. The reads this project holds
+  are two of the four batches: each pool is one MiSeq run with its own run number (above),
+  and the two runs draw their 6-nt barcodes from one set of 25 — Pool 1's 23 barcodes are
+  all among Pool 2's 25 —, as the 25-barcode limit predicts. The counts are recorded as
+  they are, without reconciling them: 100 specimens sequenced, 96 specimens plus
+  `Repetido` in the OTU table, 23 + 25 in the two pools.
+- **When.** The notes give no date for this cohort; the data bound it. The OTU table
+  records its own generation, `2014-10-19T18:14:06`, by QIIME 1.8.0 (released December
+  2013), so the specimens were sequenced and analysed by October 2014 and collected in 2014
+  or earlier. Two further observations are consistent with that without dating anything on
+  their own: the two pools are runs 4 and 6 of the same instrument, `M01459`, and the notes
+  tie the batch size to the barcodes available "at that time".
+- **The notes describe two cohorts side by side.** Their collection window (January 2022 to
+  March 2024) and their inclusion, exclusion and elimination criteria belong to the cohort
+  documented in this repository
+  ([`RUN_MALIAMPI.md`](RUN_MALIAMPI.md#where-the-111-libraries-come-from-and-how-they-were-sequenced)),
+  not to this one: that window cannot hold specimens whose OTU table was generated in 2014.
+  Whether the Michigan study applied the same criteria — among them enrolment before 18
+  weeks of gestation, with gestational age from the last menstrual period confirmed by
+  ultrasound — the notes do not say. It is an open question for the investigators.
 
 ## 2. Why the documented pipeline cannot simply be pointed at them
 
@@ -134,6 +169,13 @@ had to be rebuilt from count fingerprints because the labels could not be truste
 Michigan labelling is in better shape, and the same fingerprint technique is available:
 the OTU table of the original analysis is held alongside the reads.
 
+One shortcut is not available. The `BarcodeSequence` column of `MP1.txt` holds 97 distinct
+6-nt values, and for none of the 48 specimens with reads does it match the barcode written
+in that specimen's read records; one of the 48 read barcodes appears anywhere in the
+column, about what chance predicts for 97 values out of 4,096 possible. The mapping file's
+barcodes are not the sequencing barcodes, so they cannot link reads to specimens; the
+labels and the count fingerprints can.
+
 Precondition 2 decides whether there is a validation at all. A specimen without a known
 outcome cannot test a prediction, and an Approach 1 model cannot be applied to a specimen
 that lacks gestational week or maternal age. The OTU table covers 15 participants; how
@@ -150,8 +192,11 @@ for character, among the OTU table's 97 columns (SHA-256 `a3fb428783c4…`), and
 outcome for each. Gestational week at sampling and maternal age are present for **none** of
 the 15: neither file carries either variable, the OTU table has no per-column metadata at all
 (QIIME 1.8.0, 2014), and the time of collection that the specimen label encodes (§1) is not
-a gestational week. The per-participant list these counts come from — specimen counts, outcome, and the
-two missing variables, marked absent for all 15 — is held with the project data
+a gestational week. The enrolment criteria in the investigators' notes establish
+gestational age by last menstrual period and ultrasound, but they are the documented
+cohort's (§1); whether the Michigan study recorded it is part of what has to be asked.
+The per-participant list these counts come from — specimen counts, outcome, and the two
+missing variables, marked absent for all 15 — is held with the project data
 (`michigan_cohort_coverage_48_specimens.csv`, SHA-256 `54f0c20c7580…`), not in this
 repository. A request for the two missing variables and for the unmerged per-specimen reads
 has already gone to the study's investigators; nothing has come back yet.
@@ -193,5 +238,6 @@ place twice and keep the outputs in separate directories with separate manifests
 | Revised | 2026-11-04: precondition 2 counted — 8 of the 15 participants are reached by the 48 specimens with reads, none of the 15 has gestational week at sampling or maternal age |
 | Revised | 2026-11-04: two MiSeq runs, not one; Pool 1's copy is truncated; the route denoises before placing, it does not skip denoising; the specimens are Mexican, not a different population |
 | Revised | 2026-11-10: specimen labels are participant-level data; the examples are invented, the irregular IDs are described by their pattern, what a label encodes is stated without the key, and the investigators' notes are cited by SHA-256; no public deposit before relabelling |
+| Revised | 2026-11-17: what the investigators' notes establish — four sequencing batches of 25, two of them held here; why the cohort is called Michigan; cervicovaginal swabs; sequenced and analysed by October 2014; the notes' collection window and criteria are the documented cohort's; the mapping file's barcodes are not the sequencing barcodes |
 | Status | planned, not started |
 | Reviewed by | *pending* |
